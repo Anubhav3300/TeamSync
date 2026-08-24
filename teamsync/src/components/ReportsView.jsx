@@ -1,12 +1,12 @@
 import React from 'react';
-import { Download, FileText, Target, Zap, Clock, AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
+import { Target, Zap, Clock, AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
 
 /**
  * ReportsView Component
  * ----------------------------------------------------
  * High-end enterprise analytics and reporting dashboard with Lucide icons.
  */
-function ReportsView({ projects = [], tasks = [], teamMembers = [], onExportReport }) {
+function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
   const completedTasks = tasks.filter(t => t.status === 'DONE').length;
   const inProgressTasks = tasks.filter(t => t.status === 'IN PROGRESS').length;
   const inReviewTasks = tasks.filter(t => t.status === 'REVIEW').length;
@@ -24,42 +24,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [], onExportRepo
     { sprint: 'Sprint 24', committed: 52, completed: 46 }
   ];
 
-  const handleDownloadJSON = () => {
-    const data = {
-      generatedAt: new Date().toISOString(),
-      summary: {
-        totalProjects: projects.length,
-        totalTasks,
-        completedTasks,
-        completionRate: `${completionRate}%`
-      },
-      projects,
-      tasks,
-      teamMembers
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `TeamSync_Report_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-  };
-
-  const handleDownloadCSV = () => {
-    let csv = 'Task ID,Title,Project,Status,Priority,Assignee,Due Date\n';
-    tasks.forEach(t => {
-      csv += `"${t.id}","${t.title.replace(/"/g, '""')}","${t.projectName}","${t.status}","${t.priority}","${t.assigneeName}","${t.dueDate}"\n`;
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `TeamSync_Tasks_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-  };
-
   return (
     <div className="page-content">
       {/* Header */}
@@ -67,17 +31,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [], onExportRepo
         <div className="page-title-group">
           <h1>Productivity & Velocity Reports</h1>
           <p>Analyze team throughput, sprint velocity, and resource health metrics.</p>
-        </div>
-
-        <div className="page-header-actions">
-          <button className="btn-secondary" onClick={handleDownloadCSV} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <FileText size={15} />
-            <span>Export CSV</span>
-          </button>
-          <button className="btn-primary" onClick={handleDownloadJSON} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <Download size={15} />
-            <span>Download Full Report</span>
-          </button>
         </div>
       </div>
 

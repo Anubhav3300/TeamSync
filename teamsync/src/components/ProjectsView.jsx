@@ -58,18 +58,6 @@ function ProjectsView({
             />
           </div>
 
-          {projects.length > 0 && onClearAllProjects && (
-            <button
-              className="btn-secondary"
-              onClick={onClearAllProjects}
-              title="Clear all projects to start fresh"
-              style={{ color: '#EF4444', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <Trash2 size={14} />
-              <span>Clear All</span>
-            </button>
-          )}
-
           <button className="btn-primary" onClick={onOpenCreateProject} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <Plus size={16} />
             <span>Create Project</span>

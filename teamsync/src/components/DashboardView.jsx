@@ -64,9 +64,9 @@ function DashboardView({
   const myRelevantTasks = userAssignedTasks.length > 0
     ? userAssignedTasks
     : tasks.filter(t => {
-        const isManager = projects.some(p => p.manager === currentUser?.name && p.id === t.projectId);
-        return isManager || currentUser?.systemRole === 'Admin';
-      });
+      const isManager = projects.some(p => p.manager === currentUser?.name && p.id === t.projectId);
+      return isManager || currentUser?.systemRole === 'Admin';
+    });
 
   // Calculate left work (pending tasks)
   const myPendingTasks = myRelevantTasks.filter(t => t.status !== 'DONE');
@@ -196,17 +196,6 @@ function DashboardView({
         </div>
 
         <div className="page-header-actions">
-          {onClearAllProjects && projects.length > 0 && (
-            <button
-              className="btn-secondary"
-              onClick={onClearAllProjects}
-              style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-              title="Clear all projects to start with a fresh empty workspace"
-            >
-              <Trash2 size={14} />
-              <span>Clear All Projects</span>
-            </button>
-          )}
           <button className="btn-secondary" onClick={() => onOpenCreateTask('TO DO')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <Plus size={15} />
             <span>New Task</span>
@@ -513,7 +502,7 @@ function DashboardView({
                           width: `${project.progress}%`,
                           background:
                             project.progress > 80 ? 'var(--success)' :
-                            project.progress < 40 ? 'var(--warning)' : 'var(--primary)'
+                              project.progress < 40 ? 'var(--warning)' : 'var(--primary)'
                         }}
                       />
                     </div>
