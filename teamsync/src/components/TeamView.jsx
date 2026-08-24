@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
+import { UserPlus, Trash2, Plus, X, Send, Users, ShieldCheck, Mail } from 'lucide-react';
 
 /**
  * TeamView Component
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. JavaScript Object Creation: Constructing dynamic member objects with ID & timestamp
- * 2. React State (useState): Modal open/close state and controlled form inputs
- * 3. DOM Manipulation: Dynamic workload capacity progress meters
- * 4. Props: Adding new team members to shared application state
+ * High-end enterprise team directory and capacity balancing with Lucide icons.
  */
-function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
+function TeamView({
+  teamMembers = [],
+  currentUser,
+  onAddTeamMember,
+  onDeleteTeamMember,
+  onOpenCreateTask
+}) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -26,7 +29,7 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
       email: email.trim(),
       role,
       department,
-      avatar: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 90000000)}?w=150&auto=format&fit=crop&q=80`,
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name.trim())}&backgroundColor=4f46e5,3b82f6,10b981`,
       initials: name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
       activeTasks: 0,
       maxCapacity: 15,
@@ -44,13 +47,14 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
       {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
-          <h1>Team Directory & Workload</h1>
+          <h1>Team Directory ({teamMembers.length})</h1>
           <p>Collaborate, balance team capacity, and manage cross-functional ownership.</p>
         </div>
 
         <div className="page-header-actions">
-          <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-            <span>+ Invite Member</span>
+          <button className="btn-primary" onClick={() => setShowAddModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <UserPlus size={16} />
+            <span>Invite Member</span>
           </button>
         </div>
       </div>
@@ -64,6 +68,7 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
         {teamMembers.map((member) => {
           const isHeavy = member.activeTasks >= 15;
           const percent = Math.min(100, Math.round((member.activeTasks / member.maxCapacity) * 100));
+          const isCurrentUser = currentUser && (member.id === currentUser.id || member.email === currentUser.email);
 
           return (
             <div key={member.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -87,9 +92,16 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                    {member.name}
-                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                      {member.name}
+                    </h3>
+                    {isCurrentUser && (
+                      <span style={{ fontSize: '0.68rem', padding: '2px 6px', background: 'var(--primary-light)', color: 'var(--primary)', borderRadius: '4px', fontWeight: 700 }}>
+                        YOU
+                      </span>
+                    )}
+                  </div>
                   <div style={{ fontSize: '0.82rem', color: 'var(--primary)', fontWeight: 600 }}>
                     {member.role}
                   </div>
@@ -116,7 +128,24 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
               </div>
 
               {/* Member Footer */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
+                {!isCurrentUser && onDeleteTeamMember ? (
+                  <button
+                    className="btn-sm"
+                    style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                    onClick={() => onDeleteTeamMember(member.id)}
+                    title="Remove team member"
+                  >
+                    <Trash2 size={13} />
+                    <span>Remove</span>
+                  </button>
+                ) : (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <ShieldCheck size={13} style={{ color: 'var(--primary)' }} />
+                    <span>Workspace Owner</span>
+                  </span>
+                )}
+
                 <button
                   className="btn-secondary btn-sm"
                   onClick={() => onOpenCreateTask('TO DO')}
@@ -127,6 +156,30 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
             </div>
           );
         })}
+
+        {/* Invite Member Quick Action Card */}
+        <div
+          className="card"
+          onClick={() => setShowAddModal(true)}
+          style={{
+            border: '2px dashed var(--border)',
+            background: 'transparent',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '200px',
+            cursor: 'pointer',
+            textAlign: 'center',
+            gap: '8px'
+          }}
+        >
+          <div style={{ display: 'inline-flex', padding: '14px', borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', marginBottom: '4px' }}>
+            <UserPlus size={24} />
+          </div>
+          <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>Invite New Member</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Add developers, designers, or managers to your team</div>
+        </div>
       </div>
 
       {/* Add Member Modal */}
@@ -134,8 +187,13 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="modal-title">Invite New Team Member</h3>
-              <button className="modal-close-btn" onClick={() => setShowAddModal(false)}>&times;</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <UserPlus size={20} style={{ color: 'var(--primary)' }} />
+                <h3 className="modal-title">Invite New Team Member</h3>
+              </div>
+              <button className="modal-close-btn" onClick={() => setShowAddModal(false)} title="Close">
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleAddMember}>
@@ -205,8 +263,9 @@ function TeamView({ teamMembers, onAddTeamMember, onOpenCreateTask }) {
                 <button type="button" className="btn-secondary" onClick={() => setShowAddModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
-                  Send Invitation
+                <button type="submit" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Send size={15} />
+                  <span>Send Invitation</span>
                 </button>
               </div>
             </form>

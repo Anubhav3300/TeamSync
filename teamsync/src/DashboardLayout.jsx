@@ -16,8 +16,7 @@ import TaskDetailsModal from './components/modals/TaskDetailsModal';
 import {
   initialProjects,
   initialTasks,
-  initialTeamMembers,
-  initialNotifications
+  initialTeamMembers
 } from './data/mockData';
 
 /**
@@ -33,26 +32,73 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
   // Navigation active tab: 'dashboard' | 'projects' | 'tasks' | 'team' | 'calendar' | 'reports' | 'settings'
   const [activeTab, setActiveTab] = useState('dashboard');
   
+  // Unique storage key per user
+  const userStoragePrefix = `teamsync_${currentUser?.id || 'default'}`;
+
   // Application Data State (Arrays of Objects)
+  // Default to empty array [] so there are NO predefined projects!
   const [projects, setProjects] = useState(() => {
-    return currentUser?.isNewAccount ? [] : initialProjects;
+    try {
+      const saved = localStorage.getItem(`${userStoragePrefix}_projects`);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [];
   });
+
   const [tasks, setTasks] = useState(() => {
-    return currentUser?.isNewAccount ? [] : initialTasks;
+    try {
+      const saved = localStorage.getItem(`${userStoragePrefix}_tasks`);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [];
   });
-  const [teamMembers, setTeamMembers] = useState(initialTeamMembers);
-  const [notifications, setNotifications] = useState(() => {
-    return currentUser?.isNewAccount ? [
-      {
-        id: 'notif-welcome',
-        title: 'Welcome to TeamSync!',
-        message: 'Your clean workspace is ready. Start by creating a project.',
-        time: 'Just now',
-        read: false,
-        type: 'assignment'
-      }
-    ] : initialNotifications;
+
+  // Persist projects to localStorage per user
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(`${userStoragePrefix}_projects`, JSON.stringify(projects));
+    } catch (e) {}
+  }, [projects, userStoragePrefix]);
+
+  // Persist tasks to localStorage per user
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(`${userStoragePrefix}_tasks`, JSON.stringify(tasks));
+    } catch (e) {}
+  }, [tasks, userStoragePrefix]);
+
+  // Team Members State: Initialize with ONLY currentUser by default (no predefined mock members)
+  const [teamMembers, setTeamMembers] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`${userStoragePrefix}_team`);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+
+    if (currentUser) {
+      return [
+        {
+          id: currentUser.id || 'usr-me',
+          name: currentUser.name || 'Admin',
+          email: currentUser.email || 'admin@teamsync.io',
+          role: currentUser.role || 'Project Manager',
+          avatar: currentUser.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUser.name || 'Admin')}`,
+          initials: currentUser.initials || (currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : 'ME'),
+          department: currentUser.department || 'Product',
+          activeTasks: 0,
+          maxCapacity: 15,
+          status: 'online'
+        }
+      ];
+    }
+    return [];
   });
+
+  // Persist team members to localStorage per user
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(`${userStoragePrefix}_team`, JSON.stringify(teamMembers));
+    } catch (e) {}
+  }, [teamMembers, userStoragePrefix]);
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,18 +117,113 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  // Load demo sample data if user wants to populate mock projects and full team
   const handleLoadSampleData = () => {
     setProjects(initialProjects);
     setTasks(initialTasks);
-    setNotifications(initialNotifications);
-    setCurrentUser(prev => ({ ...prev, isNewAccount: false }));
-    showToast('✨ Demo sample data loaded successfully!');
+    setTeamMembers(initialTeamMembers);
+    if (currentUser?.isNewAccount) {
+      setCurrentUser({ ...currentUser, isNewAccount: false });
+    }
+    showToast('✨ Demo sample data and team loaded successfully!');
+  };
+
+  // Clear all projects, tasks, and reset team to only current user
+  const handleClearAllProjects = () => {
+    setProjects([]);
+    setTasks([]);
+    setSelectedProject(null);
+    setSelectedTaskDetails(null);
+
+    const soloTeam = currentUser ? [
+      {
+        id: currentUser.id || 'usr-me',
+        name: currentUser.name || 'Admin',
+        email: currentUser.email || 'admin@teamsync.io',
+        role: currentUser.role || 'Project Manager',
+        avatar: currentUser.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUser.name || 'Admin')}`,
+        initials: currentUser.initials || (currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : 'ME'),
+        department: currentUser.department || 'Product',
+        activeTasks: 0,
+        maxCapacity: 15,
+        status: 'online'
+      }
+    ] : [];
+
+    setTeamMembers(soloTeam);
+
+    try {
+      localStorage.setItem(`${userStoragePrefix}_projects`, JSON.stringify([]));
+      localStorage.setItem(`${userStoragePrefix}_tasks`, JSON.stringify([]));
+      localStorage.setItem(`${userStoragePrefix}_team`, JSON.stringify(soloTeam));
+    } catch (e) {}
+
+    showToast('🧹 Workspace & Team cleared. You now have a 100% clean slate!');
   };
 
   // State manipulation handlers
   const handleAddProject = (newProject) => {
     setProjects([newProject, ...projects]);
-    showToast(`Project "${newProject.name}" created!`);
+
+    // Extract all member names/identifiers from the new project
+    const projectMemberNames = Array.isArray(newProject.members) ? [...newProject.members] : [];
+    if (newProject.manager && !projectMemberNames.includes(newProject.manager)) {
+      projectMemberNames.push(newProject.manager);
+    }
+
+    const membersToAdd = [];
+
+    projectMemberNames.forEach((rawName) => {
+      if (!rawName || typeof rawName !== 'string') return;
+      const cleanName = rawName.trim();
+      if (!cleanName) return;
+
+      // Check if member already exists in current teamMembers directory by id or name
+      const alreadyExists = teamMembers.some(
+        tm => tm.id === cleanName || tm.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
+      );
+
+      if (!alreadyExists) {
+        // Also check if already staged in membersToAdd
+        const alreadyStaged = membersToAdd.some(
+          st => st.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
+        );
+
+        if (!alreadyStaged) {
+          const nameParts = cleanName.split(' ');
+          const initials = nameParts.map(p => p[0]).slice(0, 2).join('').toUpperCase() || 'TM';
+          const emailPrefix = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '.').replace(/\.+/g, '.');
+          const isManager = cleanName.toLowerCase() === (newProject.manager || '').toLowerCase();
+
+          // Infer appropriate department based on project category
+          let dept = 'Engineering';
+          if (newProject.category?.toLowerCase().includes('design')) dept = 'Design';
+          else if (newProject.category?.toLowerCase().includes('marketing') || newProject.category?.toLowerCase().includes('growth')) dept = 'Marketing';
+          else if (newProject.category?.toLowerCase().includes('data') || newProject.category?.toLowerCase().includes('ai')) dept = 'Data & AI';
+          else if (isManager) dept = 'Product';
+
+          membersToAdd.push({
+            id: 'usr-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+            name: cleanName,
+            email: `${emailPrefix || 'member'}@teamsync.io`,
+            role: isManager ? 'Project Manager' : 'Developer',
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanName)}`,
+            initials: initials,
+            department: dept,
+            activeTasks: 0,
+            maxCapacity: 15,
+            status: 'online'
+          });
+        }
+      }
+    });
+
+    if (membersToAdd.length > 0) {
+      setTeamMembers(prev => [...prev, ...membersToAdd]);
+      showToast(`Project created & ${membersToAdd.length} member(s) added to Team Directory!`);
+    } else {
+      showToast(`Project "${newProject.name}" created!`);
+    }
   };
 
   const handleDeleteProject = (projectId) => {
@@ -209,18 +350,19 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     showToast(`Invited ${newMember.name} to workspace!`);
   };
 
-  const handleMarkNotificationRead = (notifId) => {
-    setNotifications(notifications.map(n => {
-      if (n.id === notifId) return { ...n, read: true };
-      return n;
-    }));
+  const handleDeleteTeamMember = (memberId) => {
+    if (currentUser && (memberId === currentUser.id || memberId === 'usr-me')) {
+      showToast('Cannot remove workspace owner.');
+      return;
+    }
+    setTeamMembers(teamMembers.filter(m => m.id !== memberId));
+    showToast('Team member removed.');
   };
 
   const handleExportReport = () => {
     setActiveTab('reports');
   };
 
-  const unreadNotifs = notifications.filter(n => !n.read).length;
   const pendingTasksCount = tasks.filter(t => t.status !== 'DONE').length;
 
   return (
@@ -258,7 +400,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         theme={theme}
         setTheme={setTheme}
         onLogout={onLogout}
-        unreadCount={unreadNotifs}
         pendingTasksCount={pendingTasksCount}
       />
 
@@ -267,16 +408,8 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         <TopNav
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          onOpenCreateTask={() => {
-            setCreateTaskDefaultStatus('TO DO');
-            setIsCreateTaskOpen(true);
-          }}
-          onOpenCreateProject={() => setIsCreateProjectOpen(true)}
           currentUser={currentUser}
           setCurrentUser={setCurrentUser}
-          notifications={notifications}
-          onMarkNotificationRead={handleMarkNotificationRead}
-          onViewNotifications={() => setActiveTab('settings')}
           onLogout={onLogout}
         />
 
@@ -305,6 +438,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
               setCreateTaskDefaultStatus(status || 'TO DO');
               setIsCreateTaskOpen(true);
             }}
+            onClearAllProjects={handleClearAllProjects}
             onLoadSampleData={handleLoadSampleData}
             onExportReport={handleExportReport}
           />
@@ -319,6 +453,8 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
               setActiveTab('tasks');
             }}
             onDeleteProject={handleDeleteProject}
+            onClearAllProjects={handleClearAllProjects}
+            onLoadSampleData={handleLoadSampleData}
             teamMembers={teamMembers}
             searchQuery={searchQuery}
           />
@@ -343,7 +479,9 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         {activeTab === 'team' && (
           <TeamView
             teamMembers={teamMembers}
+            currentUser={currentUser}
             onAddTeamMember={handleAddTeamMember}
+            onDeleteTeamMember={handleDeleteTeamMember}
             onOpenCreateTask={() => setIsCreateTaskOpen(true)}
           />
         )}
@@ -364,56 +502,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           />
         )}
 
-        {activeTab === 'notifications' && (
-          <div className="page-content">
-            <div className="page-header">
-              <div className="page-title-group">
-                <h1>Notification Stream</h1>
-                <p>Activity logs, assignments, and automated milestone updates.</p>
-              </div>
-              <button
-                className="btn-secondary"
-                onClick={() => notifications.forEach(n => handleMarkNotificationRead(n.id))}
-              >
-                Mark All Read
-              </button>
-            </div>
-
-            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {notifications.map((n) => (
-                <div
-                  key={n.id}
-                  onClick={() => handleMarkNotificationRead(n.id)}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '10px',
-                    border: '1px solid var(--border)',
-                    background: n.read ? 'transparent' : 'var(--bg-subtle)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <span style={{ fontSize: '1.4rem' }}>
-                      {n.type === 'assignment' ? '📝' : n.type === 'calendar' ? '📅' : n.type === 'milestone' ? '🎉' : '💬'}
-                    </span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>{n.title}</div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{n.message}</div>
-                    </div>
-                  </div>
-
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-subtle)' }}>
-                    {n.time} {!n.read && '●'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {activeTab === 'settings' && (
           <SettingsView
             currentUser={currentUser}
@@ -421,6 +509,8 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             theme={theme}
             setTheme={setTheme}
             onLogout={onLogout}
+            onClearAllProjects={handleClearAllProjects}
+            onLoadSampleData={handleLoadSampleData}
           />
         )}
       </div>

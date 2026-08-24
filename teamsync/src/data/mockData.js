@@ -10,11 +10,11 @@
 export const initialTeamMembers = [
   {
     id: 'usr-1',
-    name: 'Sarah Jenkins',
-    email: 'sarah.j@teamsync.io',
+    name: 'Rohan Verma',
+    email: 'rohan.v@teamsync.io',
     role: 'Project Manager',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    initials: 'SJ',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    initials: 'RV',
     department: 'Product',
     activeTasks: 8,
     maxCapacity: 15,
@@ -93,8 +93,8 @@ export const initialProjects = [
     progress: 68,
     completedTasks: 24,
     totalTasks: 36,
-    manager: 'Sarah Jenkins',
-    managerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    manager: 'Rohan Verma',
+    managerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     dueDate: '2026-10-24',
     members: ['usr-1', 'usr-2', 'usr-3'],
     color: '#3B82F6',
@@ -127,8 +127,8 @@ export const initialProjects = [
     progress: 95,
     completedTasks: 142,
     totalTasks: 150,
-    manager: 'Sarah Jenkins',
-    managerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    manager: 'Rohan Verma',
+    managerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     dueDate: '2026-09-30',
     members: ['usr-1', 'usr-2', 'usr-4'],
     color: '#10B981',
@@ -144,8 +144,8 @@ export const initialProjects = [
     progress: 75,
     completedTasks: 45,
     totalTasks: 60,
-    manager: 'Sarah Jenkins',
-    managerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    manager: 'Rohan Verma',
+    managerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     dueDate: '2026-10-24',
     members: ['usr-1', 'usr-3', 'usr-5'],
     color: '#6366F1',
@@ -208,7 +208,7 @@ export const initialTasks = [
       { id: 'st-3', text: 'Generate SDK client types', done: false }
     ],
     comments: [
-      { id: 'c-1', author: 'Sarah Jenkins', time: '2 hours ago', text: 'Please ensure rate limits are clearly specified in header tables.' },
+      { id: 'c-1', author: 'Rohan Verma', time: '2 hours ago', text: 'Please ensure rate limits are clearly specified in header tables.' },
       { id: 'c-2', author: 'David Kim', time: '1 hour ago', text: 'Added the 429 Retry-After header documentation!' }
     ]
   },
@@ -294,7 +294,7 @@ export const initialTasks = [
       { id: 'st-12', text: 'Load test 5,000 req/sec', done: true }
     ],
     comments: [
-      { id: 'c-4', author: 'Sarah Jenkins', time: 'Oct 5', text: 'Passed load testing with 0 duplicate charges. Great job!' }
+      { id: 'c-4', author: 'Rohan Verma', time: 'Oct 5', text: 'Passed load testing with 0 duplicate charges. Great job!' }
     ]
   },
   {
@@ -359,7 +359,7 @@ export const initialNotifications = [
   {
     id: 'notif-1',
     title: 'Task Assigned',
-    message: 'Sarah Jenkins assigned you to "Implement OAuth2 & SSO Flow"',
+    message: 'Rohan Verma assigned you to "Implement OAuth2 & SSO Flow"',
     time: '10m ago',
     read: false,
     type: 'assignment'
@@ -392,9 +392,9 @@ export const initialNotifications = [
 
 export const initialCurrentUser = {
   id: 'usr-1',
-  name: 'Sarah Jenkins',
-  email: 'sarah.j@teamsync.io',
+  name: 'Rohan Verma',
+  email: 'rohan.v@teamsync.io',
   role: 'Project Manager',
   systemRole: 'Admin', // 'Admin' | 'Project Manager' | 'Developer' | 'Designer'
-  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
 };

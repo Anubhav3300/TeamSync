@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
+import { X, Plus, ListTodo } from 'lucide-react';
 
 /**
  * CreateTaskModal Component
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. Controlled Form Inputs (DOM Manipulation): Links state to inputs, selects, textareas
- * 2. JavaScript Array.find(): Looks up project and assignee by ID
- * 3. React Props & Callbacks: onAddTask() passes new task object to parent
- * 4. Conditional Rendering: Modal only mounts when isOpen is true
+ * High-end modal for adding individual deliverables with Lucide icons.
  */
 function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus = 'TO DO' }) {
   const [title, setTitle] = useState('');
@@ -18,10 +15,8 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
   const [assigneeName, setAssigneeName] = useState('');
   const [dueDate, setDueDate] = useState('2026-10-20');
 
-  // Currently selected project
   const selectedProject = projects.find(p => p.id === projectId) || projects[0];
 
-  // Dynamically resolve assignees ONLY for the selected project (user-entered team members & leader)
   const projectAssignees = React.useMemo(() => {
     const map = new Map();
     const addMember = (raw) => {
@@ -47,7 +42,6 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
       if (Array.isArray(selectedProject.members)) selectedProject.members.forEach(addMember);
     }
 
-    // Fallback if no members are specified
     if (map.size === 0) {
       map.set('lead', { id: 'usr-lead', name: 'Team Lead' });
     }
@@ -76,7 +70,7 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
       priority,
       assigneeId: chosenAssignee.id,
       assigneeName: chosenAssignee.name,
-      assigneeAvatar: null, // Use default profile icon
+      assigneeAvatar: null,
       dueDate,
       commentsCount: 0,
       attachmentsCount: 0,
@@ -95,18 +89,24 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="modal-title">Create New Task</h3>
-          <button className="modal-close-btn" onClick={onClose}>&times;</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ListTodo size={20} style={{ color: 'var(--primary)' }} />
+            <h3 className="modal-title">Create New Task</h3>
+          </div>
+          <button className="modal-close-btn" onClick={onClose} title="Close">
+            <X size={18} />
+          </button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
+            {/* Task Title */}
             <div className="form-group">
               <label className="form-label">Task Title *</label>
               <input
                 type="text"
                 className="form-input"
-                placeholder="e.g. Implement OAuth2 & SSO Flow"
+                placeholder="e.g. Implement OAuth2 Refresh Token Rotation"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -114,25 +114,41 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
               />
             </div>
 
+            {/* Project & Assignee */}
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Associated Project</label>
+                <label className="form-label">Project *</label>
                 <select
                   className="form-select"
                   value={projectId}
                   onChange={(e) => {
                     setProjectId(e.target.value);
-                    setAssigneeName(''); // Reset selected assignee when project switches
+                    setAssigneeName('');
                   }}
                 >
-                  {projects.map((proj) => (
-                    <option key={proj.id} value={proj.id}>
-                      {proj.name}
-                    </option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
               </div>
 
+              <div className="form-group">
+                <label className="form-label">Assignee</label>
+                <select
+                  className="form-select"
+                  value={assigneeName}
+                  onChange={(e) => setAssigneeName(e.target.value)}
+                >
+                  <option value="">Select an assignee...</option>
+                  {projectAssignees.map((mem) => (
+                    <option key={mem.id} value={mem.name}>{mem.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Status, Priority & Due Date */}
+            <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Status Stage</label>
                 <select
@@ -146,11 +162,9 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
                   <option value="DONE">DONE</option>
                 </select>
               </div>
-            </div>
 
-            <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Priority Level</label>
+                <label className="form-label">Priority</label>
                 <select
                   className="form-select"
                   value={priority}
@@ -163,36 +177,23 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
               </div>
 
               <div className="form-group">
-                <label className="form-label">Assigned to</label>
-                <select
-                  className="form-select"
-                  value={assigneeName || projectAssignees[0]?.name || ''}
-                  onChange={(e) => setAssigneeName(e.target.value)}
-                >
-                  {projectAssignees.map((member) => (
-                    <option key={member.id} value={member.name}>
-                      👤 {member.name}
-                    </option>
-                  ))}
-                </select>
+                <label className="form-label">Due Date</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
               </div>
             </div>
 
+            {/* Task Description */}
             <div className="form-group">
-              <label className="form-label">Due Date</label>
-              <input
-                type="date"
-                className="form-input"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Task Description</label>
+              <label className="form-label">Description & Acceptance Criteria</label>
               <textarea
                 className="form-textarea"
-                placeholder="Specify acceptance criteria, technical details, or notes..."
+                rows="3"
+                placeholder="Detail technical requirements, expected deliverables..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -203,8 +204,9 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn-primary">
-              Add Task
+            <button type="submit" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Plus size={16} />
+              <span>Create Task</span>
             </button>
           </div>
         </form>

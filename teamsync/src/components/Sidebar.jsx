@@ -1,13 +1,19 @@
 import React from 'react';
+import {
+  LayoutDashboard,
+  FolderKanban,
+  CheckSquare,
+  Users,
+  BarChart3,
+  Settings,
+  LogOut,
+  Check
+} from 'lucide-react';
 
 /**
  * Sidebar Component
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. Semantic HTML5: <aside> sidebar tag and <nav> element
- * 2. Array Mapping (.map): Dynamically generates navigation items with icons and badges
- * 3. Dynamic Classes: Active tab indicator (`nav-item ${activeTab === item.id ? 'active' : ''}`)
- * 4. Props & Callbacks: setActiveTab(), setTheme(), onLogout()
+ * High-end enterprise navigation sidebar with sleek Lucide icons.
  */
 function Sidebar({
   activeTab,
@@ -15,20 +21,18 @@ function Sidebar({
   theme,
   setTheme,
   onLogout,
-  unreadCount,
   pendingTasksCount
 }) {
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'projects', label: 'My Projects', icon: '📁' },
-    { id: 'tasks', label: 'Tasks', icon: '📝', badge: pendingTasksCount },
-    { id: 'team', label: 'Team', icon: '👥' },
-    { id: 'reports', label: 'Reports', icon: '📈' }
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'projects', label: 'My Projects', icon: FolderKanban },
+    { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: pendingTasksCount },
+    { id: 'team', label: 'Team', icon: Users },
+    { id: 'reports', label: 'Reports', icon: BarChart3 }
   ];
 
   const bottomItems = [
-    { id: 'notifications', label: 'Notifications', icon: '🔔', badge: unreadCount > 0 ? unreadCount : null, urgent: true },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+    { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   return (
@@ -36,50 +40,53 @@ function Sidebar({
       {/* Brand Header */}
       <div className="sidebar-header">
         <div className="brand-icon-box">
-          ✓
+          <Check size={18} strokeWidth={3} />
         </div>
         <div className="brand-info">
           <div className="brand-title">
             TeamSync
           </div>
-          <span className="brand-version">v1.0.2 Enterprise</span>
+          <span className="brand-version">Enterprise OS</span>
         </div>
       </div>
 
       {/* Main Nav Items */}
       <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(item.id)}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span>{item.label}</span>
-            {item.badge ? (
-              <span className="nav-badge">{item.badge}</span>
-            ) : null}
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              className={`nav-item ${isActive ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.id)}
+            >
+              <Icon size={18} className="nav-icon" strokeWidth={isActive ? 2.3 : 1.8} />
+              <span>{item.label}</span>
+              {item.badge ? (
+                <span className="nav-badge">{item.badge}</span>
+              ) : null}
+            </button>
+          );
+        })}
       </nav>
 
       {/* Footer Nav */}
       <div className="sidebar-footer">
-        {bottomItems.map((item) => (
-          <button
-            key={item.id}
-            className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(item.id)}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span>{item.label}</span>
-            {item.badge ? (
-              <span className={`nav-badge ${item.urgent ? 'urgent' : ''}`}>
-                {item.badge}
-              </span>
-            ) : null}
-          </button>
-        ))}
+        {bottomItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              className={`nav-item ${isActive ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.id)}
+            >
+              <Icon size={18} className="nav-icon" strokeWidth={isActive ? 2.3 : 1.8} />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
 
         <div className="sidebar-divider" />
 
@@ -87,10 +94,17 @@ function Sidebar({
         <div style={{ padding: '0 4px' }}>
           <button
             className="btn-secondary btn-sm"
-            style={{ width: '100%', justifyContent: 'center', color: 'var(--danger)', borderColor: 'var(--border)' }}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              color: 'var(--danger)',
+              borderColor: 'var(--border)',
+              gap: '8px'
+            }}
             onClick={onLogout}
           >
-            Sign Out
+            <LogOut size={14} />
+            <span>Sign Out</span>
           </button>
         </div>
       </div>

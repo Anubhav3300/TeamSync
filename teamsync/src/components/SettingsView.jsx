@@ -1,18 +1,35 @@
 import React, { useState } from 'react';
+import {
+  User,
+  ShieldCheck,
+  Zap,
+  Trash2,
+  Sparkles,
+  LogOut,
+  Check,
+  Save,
+  Sliders,
+  Mail,
+  Shield
+} from 'lucide-react';
 
 /**
  * SettingsView Component
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. React State (useState): User profile inputs, notification toggles, active tab
- * 2. Form Submission (DOM Manipulation): Updating currentUser object via props callback
- * 3. Array Mapping: Iterating over role definitions and workspace governance
- * 4. Conditional Rendering: Switching between General, RBAC, Automations, and Notifications tabs
+ * High-end enterprise workspace settings & governance with Lucide icons.
  */
-function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }) {
+function SettingsView({
+  currentUser,
+  setCurrentUser,
+  theme,
+  setTheme,
+  onLogout,
+  onClearAllProjects,
+  onLoadSampleData
+}) {
   const [activeTab, setActiveTab] = useState('general');
-  const [name, setName] = useState(currentUser?.name || 'Sarah Jenkins');
-  const [email, setEmail] = useState(currentUser?.email || 'sarah.j@teamsync.io');
+  const [name, setName] = useState(currentUser?.name || 'Rohan Verma');
+  const [email, setEmail] = useState(currentUser?.email || 'rohan.v@teamsync.io');
   const [autoNotify, setAutoNotify] = useState(true);
   const [autoReviewer, setAutoReviewer] = useState(true);
   const [slackIntegration, setSlackIntegration] = useState(true);
@@ -66,26 +83,41 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
 
       {/* Tabs */}
       <div className="projects-filter-bar">
-        {['general', 'rbac', 'automations', 'notifications'].map((tab) => (
-          <button
-            key={tab}
-            className={`filter-tab ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab)}
-            style={{ textTransform: 'capitalize' }}
-          >
-            {tab === 'rbac' ? 'RBAC & Roles' : tab}
-          </button>
-        ))}
+        {[
+          { id: 'general', label: 'General Profile', icon: User },
+          { id: 'rbac', label: 'RBAC & Roles', icon: ShieldCheck },
+          { id: 'automations', label: 'Automations', icon: Zap }
+        ].map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              className={`filter-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Icon size={14} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab: General */}
       {activeTab === 'general' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', maxWidth: '640px', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div className="card">
-            <h3 className="card-title" style={{ marginBottom: '16px' }}>Profile Information</h3>
-            <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h3 className="card-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <User size={18} style={{ color: 'var(--primary)' }} />
+              <span>User Profile Settings</span>
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
+              Update your personal display name, communication email, and workspace preferences.
+            </p>
+
+            <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '480px' }}>
               <div className="form-group">
-                <label className="form-label">Full Name</label>
+                <label className="form-label">Display Name</label>
                 <input
                   type="text"
                   className="form-input"
@@ -115,15 +147,56 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
                 />
               </div>
 
-              <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start' }}>
-                Save Profile Changes
+              <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Save size={15} />
+                <span>Save Profile Changes</span>
               </button>
             </form>
           </div>
 
+          {/* Workspace Data Management (Clear / Restore) */}
+          <div className="card">
+            <h3 className="card-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sliders size={18} style={{ color: 'var(--primary)' }} />
+              <span>Workspace Projects & Data Controls</span>
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+              Manage your workspace data. You can clear all existing projects to start completely from scratch, or load demo sample data anytime.
+            </p>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+              {onClearAllProjects && (
+                <button
+                  type="button"
+                  onClick={onClearAllProjects}
+                  className="btn-secondary"
+                  style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Trash2 size={14} />
+                  <span>Clear All Projects & Tasks</span>
+                </button>
+              )}
+
+              {onLoadSampleData && (
+                <button
+                  type="button"
+                  onClick={onLoadSampleData}
+                  className="btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Sparkles size={14} style={{ color: 'var(--primary)' }} />
+                  <span>Load Demo Sample Data</span>
+                </button>
+              )}
+            </div>
+          </div>
+
           {onLogout && (
             <div className="card">
-              <h3 className="card-title" style={{ marginBottom: '8px', color: '#EF4444' }}>Account & Session</h3>
+              <h3 className="card-title" style={{ marginBottom: '8px', color: '#EF4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <LogOut size={18} />
+                <span>Account & Session</span>
+              </h3>
               <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
                 End your active session on this device and return to the login screen.
               </p>
@@ -131,9 +204,10 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
                 type="button"
                 onClick={onLogout}
                 className="btn-secondary"
-                style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)' }}
+                style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                Sign Out
+                <LogOut size={14} />
+                <span>Sign Out</span>
               </button>
             </div>
           )}
@@ -144,7 +218,10 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
       {activeTab === 'rbac' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div className="card">
-            <h3 className="card-title" style={{ marginBottom: '8px' }}>Role-Based Access Control (RBAC) Hierarchy</h3>
+            <h3 className="card-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={18} style={{ color: 'var(--primary)' }} />
+              <span>Role-Based Access Control (RBAC) Hierarchy</span>
+            </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
               Granular permission matrix for enterprise team members.
             </p>
@@ -180,10 +257,14 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
                           padding: '3px 8px',
                           background: 'var(--bg-surface)',
                           borderRadius: '6px',
-                          border: '1px solid var(--border)'
+                          border: '1px solid var(--border)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
                         }}
                       >
-                        ✓ {p}
+                        <Check size={11} style={{ color: 'var(--success)' }} />
+                        <span>{p}</span>
                       </span>
                     ))}
                   </div>
@@ -197,7 +278,10 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
       {/* Tab: Automations */}
       {activeTab === 'automations' && (
         <div className="card">
-          <h3 className="card-title" style={{ marginBottom: '8px' }}>Workflow Automation Triggers</h3>
+          <h3 className="card-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Zap size={18} style={{ color: 'var(--primary)' }} />
+            <span>Workflow Automation Triggers</span>
+          </h3>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
             Trigger automatic handoffs and state updates when task stages change.
           </p>
@@ -251,30 +335,6 @@ function SettingsView({ currentUser, setCurrentUser, theme, setTheme, onLogout }
         </div>
       )}
 
-      {/* Tab: Notifications */}
-      {activeTab === 'notifications' && (
-        <div className="card">
-          <h3 className="card-title" style={{ marginBottom: '8px' }}>Notification Preferences</h3>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
-            Control which notifications you receive and where they are delivered.
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-subtle)', borderRadius: '8px' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Task Assignment In-App Alerts</span>
-              <input type="checkbox" checked={autoNotify} onChange={() => setAutoNotify(!autoNotify)} />
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-subtle)', borderRadius: '8px' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Daily Digest Summary Email</span>
-              <input type="checkbox" checked={true} readOnly />
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-subtle)', borderRadius: '8px' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>Mention and Comment Notifications</span>
-              <input type="checkbox" checked={true} readOnly />
-            </label>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,97 +1,102 @@
 import React, { useState, useEffect } from 'react';
+import { authenticateUser, registerUser, DEFAULT_USERS } from '../data/authService';
+import {
+  Check,
+  ArrowLeft,
+  ArrowRight,
+  LogIn,
+  UserPlus,
+  Zap,
+  Sparkles,
+  ShieldCheck,
+  Code2,
+  Palette,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+  Mail,
+  Lock,
+  User,
+  Shield
+} from 'lucide-react';
 
 /**
- * AuthView Component (Login & Registration)
+ * AuthView Component (Sign In & Sign Up)
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. Form Handling (DOM Manipulation): e.preventDefault(), controlled input state
- * 2. React State (useState): Managing form fields (name, email, password, role)
- * 3. Conditional Rendering: Switching between Login and Registration tabs
- * 4. Props & Event Handlers: onLogin() callback to update currentUser in App.jsx
+ * High-end enterprise Authentication View with Lucide React icons.
  */
 function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [role, setRole] = useState('Project Manager');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
-  // Sync mode state if initialMode prop changes
+  // Sync mode if initialMode prop changes
   useEffect(() => {
     setMode(initialMode);
     setErrorMsg('');
+    setSuccessMsg('');
   }, [initialMode]);
 
+  // Handle Sign In / Sign Up Form Submission
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
 
-    if (!email.trim() || !password.trim()) {
-      setErrorMsg('Please enter both email and password.');
-      return;
+    if (mode === 'register') {
+      // 1. Sign Up Logic
+      const result = registerUser({ name, email, password, role });
+      if (!result.success) {
+        setErrorMsg(result.error);
+        return;
+      }
+
+      setSuccessMsg('Account created successfully! Launching workspace...');
+      setTimeout(() => {
+        onLogin(result.user, rememberMe);
+      }, 500);
+    } else {
+      // 2. Sign In Logic
+      const result = authenticateUser(email, password);
+      if (!result.success) {
+        setErrorMsg(result.error);
+        return;
+      }
+
+      setSuccessMsg('Signed in successfully! Loading workspace...');
+      setTimeout(() => {
+        onLogin(result.user, rememberMe);
+      }, 400);
     }
-
-    const isReg = mode === 'register';
-    if (isReg && !name.trim()) {
-      setErrorMsg('Please enter your full name.');
-      return;
-    }
-
-    const cleanName = isReg
-      ? (name.trim() || 'New Member')
-      : (email ? email.split('@')[0].replace('.', ' ').replace(/(^\w|\s\w)/g, m => m.toUpperCase()) : 'Sarah Jenkins');
-
-    const user = {
-      id: isReg ? 'usr-new-' + Date.now() : (email.toLowerCase().includes('david') ? 'usr-2' : email.toLowerCase().includes('elena') ? 'usr-3' : 'usr-1'),
-      name: cleanName,
-      email: email || (isReg ? 'newuser@teamsync.io' : 'sarah.j@teamsync.io'),
-      role: isReg ? role : (email.toLowerCase().includes('david') ? 'Lead Developer' : email.toLowerCase().includes('elena') ? 'UX Designer' : 'Project Manager'),
-      systemRole: role === 'Lead Developer' || email.toLowerCase().includes('david') ? 'Developer' : role === 'UX Designer' || email.toLowerCase().includes('elena') ? 'Designer' : 'Admin',
-      avatar: isReg
-        ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-        : 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-      isNewAccount: isReg
-    };
-    onLogin(user);
   };
 
-  const handleDemoLogin = (demoRole) => {
-    let demoUser = {
-      id: 'usr-1',
-      name: 'Sarah Jenkins',
-      email: 'sarah.j@teamsync.io',
-      role: 'Project Manager',
-      systemRole: 'Admin',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-      isNewAccount: false
-    };
-
-    if (demoRole === 'Developer') {
-      demoUser = {
-        id: 'usr-2',
-        name: 'David Kim',
-        email: 'david.k@teamsync.io',
-        role: 'Lead Developer',
-        systemRole: 'Developer',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        isNewAccount: false
-      };
-    } else if (demoRole === 'Designer') {
-      demoUser = {
-        id: 'usr-3',
-        name: 'Elena Rostova',
-        email: 'elena.r@teamsync.io',
-        role: 'UX Designer',
-        systemRole: 'Designer',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        isNewAccount: false
-      };
+  // Instant 1-Click Demo Logins
+  const handleDemoLogin = (userKey) => {
+    setErrorMsg('');
+    setSuccessMsg('');
+    let demoUser = DEFAULT_USERS[0]; // Rohan (Admin/PM)
+    if (userKey === 'david') {
+      demoUser = DEFAULT_USERS[1]; // David (Lead Dev)
+    } else if (userKey === 'elena') {
+      demoUser = DEFAULT_USERS[2]; // Elena (UX Designer)
     }
+    onLogin(demoUser, rememberMe);
+  };
 
-    onLogin(demoUser);
+  // Autofill form with demo credentials for testing
+  const handleFillDemoCredentials = (demoUser) => {
+    setErrorMsg('');
+    setSuccessMsg('');
+    setMode('login');
+    setEmail(demoUser.email);
+    setPassword(demoUser.password);
   };
 
   return (
@@ -104,7 +109,9 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             className="auth-brand-header"
             style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
           >
-            <div className="brand-icon-box">✓</div>
+            <div className="brand-icon-box">
+              <Check size={18} strokeWidth={3} />
+            </div>
             <span className="auth-brand-logo-text">TeamSync</span>
           </button>
         </div>
@@ -115,15 +122,18 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             <span>elevate your team.</span>
           </h1>
           <p className="auth-subtext">
-            The quiet but powerful infrastructure for complex project management. High density, low friction.
+            The modern workspace for sprint planning, task tracking, and seamless team collaboration.
           </p>
         </div>
 
-        {/* 3D Mockup Graphic Card */}
+        {/* Live Preview Card */}
         <div className="auth-mockup-card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#4F46E5' }}>TeamSync Live Preview</span>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Sprint Planning</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#4F46E5', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <Zap size={14} />
+              <span>Real-time Workspace</span>
+            </span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Sprint 12 Active</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
@@ -132,11 +142,11 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
               <div style={{ height: '6px', background: '#94A3B8', borderRadius: '4px', marginTop: '6px' }} />
             </div>
             <div style={{ padding: '8px', background: '#EFF6FF', borderRadius: '6px' }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#2563EB' }}>In Progress (2)</div>
+              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#2563EB' }}>In Progress (4)</div>
               <div style={{ height: '6px', background: '#3B82F6', borderRadius: '4px', marginTop: '6px' }} />
             </div>
             <div style={{ padding: '8px', background: '#ECFDF5', borderRadius: '6px' }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#059669' }}>Done (4)</div>
+              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#059669' }}>Done (8)</div>
               <div style={{ height: '6px', background: '#10B981', borderRadius: '4px', marginTop: '6px' }} />
             </div>
           </div>
@@ -151,11 +161,13 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             type="button"
             className="btn-auth-back"
             onClick={onBackToLanding}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            ← Back to Home
+            <ArrowLeft size={15} />
+            <span>Back to Home</span>
           </button>
 
-          {/* Segmented Mode Switcher */}
+          {/* Segmented Mode Switcher (Sign In vs Sign Up) */}
           <div className="auth-tab-switch">
             <button
               type="button"
@@ -163,9 +175,12 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
               onClick={() => {
                 setMode('login');
                 setErrorMsg('');
+                setSuccessMsg('');
               }}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
             >
-              🔑 Sign In
+              <LogIn size={15} />
+              <span>Sign In</span>
             </button>
             <button
               type="button"
@@ -173,9 +188,12 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
               onClick={() => {
                 setMode('register');
                 setErrorMsg('');
+                setSuccessMsg('');
               }}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
             >
-              ✨ Sign Up
+              <UserPlus size={15} />
+              <span>Sign Up</span>
             </button>
           </div>
 
@@ -185,30 +203,56 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             </h2>
             <p className="auth-form-desc">
               {mode === 'login'
-                ? 'Please enter your details to sign in to your workspace.'
+                ? 'Enter your credentials to access your TeamSync workspace.'
                 : 'Join over 40,000+ teams managing projects on TeamSync.'}
             </p>
           </div>
 
+          {/* Error Message Banner */}
           {errorMsg && (
             <div style={{
-              padding: '10px 14px',
+              padding: '12px 16px',
               background: '#FEE2E2',
               border: '1px solid #FCA5A5',
               borderRadius: '8px',
-              color: '#DC2626',
+              color: '#B91C1C',
               fontSize: '0.85rem',
               fontWeight: 600,
-              marginBottom: '16px'
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              ⚠️ {errorMsg}
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <span>{errorMsg}</span>
             </div>
           )}
 
+          {/* Success Message Banner */}
+          {successMsg && (
+            <div style={{
+              padding: '12px 16px',
+              background: '#ECFDF5',
+              border: '1px solid #A7F3D0',
+              borderRadius: '8px',
+              color: '#047857',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {/* Authentication Form */}
           <form onSubmit={handleSubmit}>
             {mode === 'register' && (
               <div className="auth-form-group">
-                <label className="auth-label">Full Name</label>
+                <label className="auth-label">Full Name *</label>
                 <input
                   type="text"
                   className="auth-input"
@@ -221,11 +265,11 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             )}
 
             <div className="auth-form-group">
-              <label className="auth-label">Email</label>
+              <label className="auth-label">Work Email *</label>
               <input
                 type="email"
                 className="auth-input"
-                placeholder="Enter your email"
+                placeholder="e.g. rohan.v@teamsync.io"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -249,12 +293,12 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             )}
 
             <div className="auth-form-group">
-              <label className="auth-label">Password</label>
+              <label className="auth-label">Password *</label>
               <div className="auth-input-wrap">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="auth-input"
-                  placeholder="Enter your password"
+                  placeholder={mode === 'register' ? 'Create a secure password (min 4 chars)' : 'Enter your password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -263,8 +307,11 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
                   type="button"
                   className="auth-toggle-pwd"
                   onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                 >
-                  {showPassword ? 'Hide' : 'Show'}
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  <span>{showPassword ? 'Hide' : 'Show'}</span>
                 </button>
               </div>
             </div>
@@ -280,34 +327,101 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
                   <span>Remember me</span>
                 </label>
 
-                <a href="#forgot" className="auth-forgot-link" onClick={(e) => { e.preventDefault(); alert('Reset link sent to ' + (email || 'your email')); }}>
+                <a
+                  href="#forgot"
+                  className="auth-forgot-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!email) {
+                      setErrorMsg('Please enter your email first to reset your password.');
+                    } else {
+                      alert(`Password reset instructions have been sent to ${email}`);
+                    }
+                  }}
+                >
                   Forgot password?
                 </a>
               </div>
             )}
 
-            <button type="submit" className="btn-auth-submit">
-              {mode === 'login' ? 'Sign In →' : 'Create Account & Launch Workspace →'}
+            <button
+              type="submit"
+              className="btn-auth-submit"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              <span>{mode === 'login' ? 'Sign In' : 'Create Account & Launch Workspace'}</span>
+              <ArrowRight size={16} />
             </button>
+
+            {/* Autofill Demo Hint (for users wanting to test standard Sign In) */}
+            {mode === 'login' && (
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => handleFillDemoCredentials(DEFAULT_USERS[0])}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary)',
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Sparkles size={13} />
+                  <span>Auto-fill demo credentials (rohan.v@teamsync.io / password123)</span>
+                </button>
+              </div>
+            )}
 
             <div className="auth-divider">
-              <span>Or continue with</span>
+              <span>Or 1-click demo access</span>
             </div>
 
-            <button
-              type="button"
-              className="btn-google-auth"
-              onClick={() => handleDemoLogin('Manager')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-              </svg>
-              <span>Continue with Google</span>
-            </button>
+            {/* Quick Demo Access Bar */}
+            <div className="demo-roles-box" style={{ marginTop: '8px' }}>
+              <div className="demo-roles-title" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Zap size={13} style={{ color: 'var(--primary)' }} />
+                <span>Instant Demo Login:</span>
+              </div>
+              <div className="demo-roles-buttons">
+                <button
+                  type="button"
+                  className="btn-demo-role"
+                  onClick={() => handleDemoLogin('rohan')}
+                  title="Login as Rohan Verma (Project Manager / Admin)"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <ShieldCheck size={14} style={{ color: 'var(--primary)' }} />
+                  <span>Admin (Rohan)</span>
+                </button>
+                <button
+                  type="button"
+                  className="btn-demo-role"
+                  onClick={() => handleDemoLogin('david')}
+                  title="Login as David Kim (Lead Developer)"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Code2 size={14} style={{ color: '#3B82F6' }} />
+                  <span>Lead Dev (David)</span>
+                </button>
+                <button
+                  type="button"
+                  className="btn-demo-role"
+                  onClick={() => handleDemoLogin('elena')}
+                  title="Login as Elena Rostova (UX Designer)"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Palette size={14} style={{ color: '#8B5CF6' }} />
+                  <span>Designer (Elena)</span>
+                </button>
+              </div>
+            </div>
 
+            {/* Toggle Prompt */}
             <div className="auth-toggle-prompt">
               {mode === 'login' ? (
                 <>
@@ -318,6 +432,7 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
                     onClick={() => {
                       setMode('register');
                       setErrorMsg('');
+                      setSuccessMsg('');
                     }}
                   >
                     Create Account
@@ -332,40 +447,13 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
                     onClick={() => {
                       setMode('login');
                       setErrorMsg('');
+                      setSuccessMsg('');
                     }}
                   >
-                    Sign in
+                    Sign In
                   </button>
                 </>
               )}
-            </div>
-
-            {/* Quick Demo Access Bar */}
-            <div className="demo-roles-box">
-              <div className="demo-roles-title">⚡ 1-Click Instant Demo Login:</div>
-              <div className="demo-roles-buttons">
-                <button
-                  type="button"
-                  className="btn-demo-role"
-                  onClick={() => handleDemoLogin('Manager')}
-                >
-                  👑 Admin (Sarah)
-                </button>
-                <button
-                  type="button"
-                  className="btn-demo-role"
-                  onClick={() => handleDemoLogin('Developer')}
-                >
-                  💻 Lead Dev (David)
-                </button>
-                <button
-                  type="button"
-                  className="btn-demo-role"
-                  onClick={() => handleDemoLogin('Designer')}
-                >
-                  🎨 UX Designer (Elena)
-                </button>
-              </div>
             </div>
           </form>
         </div>

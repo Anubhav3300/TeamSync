@@ -2,64 +2,89 @@ import React, { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import AuthView from './components/AuthView';
 import DashboardLayout from './DashboardLayout';
-import { initialCurrentUser } from './data/mockData';
+import { getStoredSession, saveStoredSession, clearStoredSession, DEFAULT_USERS } from './data/authService';
 
 /**
  * App Root Component
  * ----------------------------------------------------
- * Evaluation 1 Rubrics Implemented:
- * 1. Functional Components & JSX Architecture
- * 2. React State (useState) for page routing and user management
- * 3. React Side Effects (useEffect) for theme synchronization
- * 4. Props Passing to child components (LandingPage, AuthView, DashboardLayout)
+ * Simple, clean React Root Component.
+ * - Handles Page Navigation ('landing', 'auth', 'app')
+ * - Persists Session across Browser Reloads
+ * - Manages Theme Synchronization (Light / Dark)
  */
 function App() {
-  // Page state: 'landing' (public landing page) | 'auth' (login/register) | 'app' (main workspace)
-  const [pageState, setPageState] = useState('landing');
+  // Current logged in user object (restores saved session if exists)
+  const [currentUser, setCurrentUser] = useState(() => {
+    return getStoredSession() || null;
+  });
+
+  // Page state: if logged in session exists, stay in 'app' (workspace), otherwise show 'landing'
+  const [pageState, setPageState] = useState(() => {
+    const savedSession = getStoredSession();
+    return savedSession ? 'app' : 'landing';
+  });
   
   // Authentication mode: 'login' or 'register'
   const [authMode, setAuthMode] = useState('login');
   
-  // Current logged in user object
-  const [currentUser, setCurrentUser] = useState(initialCurrentUser);
-  
-  // Theme state: 'light' or 'dark'
-  const [theme, setTheme] = useState('light');
+  // Theme state: 'light' or 'dark' with persistence
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('teamsync_theme') || 'light';
+    } catch (e) {
+      return 'light';
+    }
+  });
 
   // Side effect: update data-theme on <html> root element whenever theme changes
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('teamsync_theme', theme);
+    } catch (e) {}
   }, [theme]);
 
-  // Event handler to navigate to Auth page
+  // Navigate to Auth page (Sign In or Sign Up)
   const handleOpenAuth = (mode = 'login') => {
     setAuthMode(mode);
     setPageState('auth');
   };
 
-  // Event handler when user logs in
+  // Handler when user logs in or registers (persists session)
   const handleLogin = (user) => {
     if (user) {
       setCurrentUser(user);
+      saveStoredSession(user);
     }
     setPageState('app');
   };
 
-  // Event handler when user logs out (returns to landing page)
+  // Handler for demo workspace direct access from landing page
+  const handleDemoAccess = () => {
+    const demoUser = currentUser || DEFAULT_USERS[0];
+    setCurrentUser(demoUser);
+    saveStoredSession(demoUser);
+    setPageState('app');
+  };
+
+  // Handler when user logs out (clears session and returns to landing)
   const handleLogout = () => {
+    clearStoredSession();
+    setCurrentUser(null);
     setPageState('landing');
   };
 
-  // Conditional Rendering based on pageState
+  // 1. Landing Page View (when not logged in)
   if (pageState === 'landing') {
     return (
       <LandingPage
-        onLogin={() => setPageState('app')}
+        onLogin={handleDemoAccess}
         onOpenAuth={handleOpenAuth}
       />
     );
   }
 
+  // 2. Authentication View (Sign In / Sign Up)
   if (pageState === 'auth') {
     return (
       <AuthView
@@ -71,10 +96,14 @@ function App() {
     );
   }
 
+  // 3. Main Dashboard Workspace (when authenticated)
   return (
     <DashboardLayout
       currentUser={currentUser}
-      setCurrentUser={setCurrentUser}
+      setCurrentUser={(updatedUser) => {
+        setCurrentUser(updatedUser);
+        saveStoredSession(updatedUser);
+      }}
       onLogout={handleLogout}
       theme={theme}
       setTheme={setTheme}

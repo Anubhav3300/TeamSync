@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
+import { Search, Plus, Trash2, Folder, FolderPlus, MoreVertical, CheckSquare, Sparkles, User } from 'lucide-react';
 
 /**
  * ProjectsView Component
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. JavaScript String & Array Methods: .toLowerCase().includes() for dynamic search
- * 2. React State (useState): Tab filtering ('All Projects', 'Active', 'Completed', 'On Hold')
- * 3. Props: Receiving projects list and handler callbacks from DashboardLayout
- * 4. CSS Grid: Responsive project card layout with progress bars
+ * High-end enterprise projects catalog with Lucide icons.
  */
 function ProjectsView({
   projects,
   onOpenCreateProject,
   onSelectProject,
   onDeleteProject,
+  onClearAllProjects,
+  onLoadSampleData,
   teamMembers,
   searchQuery
 }) {
@@ -43,13 +42,13 @@ function ProjectsView({
       {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
-          <h1>Projects</h1>
-          <p>Manage and track your team's ongoing initiatives.</p>
+          <h1>Projects ({projects.length})</h1>
+          <p>Manage, prioritize, and monitor your team's ongoing project deliverables.</p>
         </div>
 
         <div className="page-header-actions">
-          <div className="nav-search-container" style={{ width: '260px' }}>
-            <span>🔍</span>
+          <div className="nav-search-container" style={{ width: '220px' }}>
+            <Search size={15} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
             <input
               type="text"
               className="nav-search-input"
@@ -59,12 +58,21 @@ function ProjectsView({
             />
           </div>
 
-          <button className="btn-secondary">
-            <span>⚙️</span>
-          </button>
+          {projects.length > 0 && onClearAllProjects && (
+            <button
+              className="btn-secondary"
+              onClick={onClearAllProjects}
+              title="Clear all projects to start fresh"
+              style={{ color: '#EF4444', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Trash2 size={14} />
+              <span>Clear All</span>
+            </button>
+          )}
 
-          <button className="btn-primary" onClick={onOpenCreateProject}>
-            <span>+ Create Project</span>
+          <button className="btn-primary" onClick={onOpenCreateProject} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Plus size={16} />
+            <span>Create Project</span>
           </button>
         </div>
       </div>
@@ -85,13 +93,16 @@ function ProjectsView({
       {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--bg-surface)', borderRadius: '14px', border: '1px dashed var(--border)' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📁</div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '6px' }}>No projects found</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
-            Try adjusting your search criteria or create a brand new project.
+          <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', marginBottom: '14px' }}>
+            <FolderPlus size={32} />
+          </div>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '6px', color: 'var(--text-main)' }}>No projects found</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', maxWidth: '400px', margin: '0 auto 20px auto' }}>
+            Try adjusting your search criteria or create a brand new project to get started.
           </p>
-          <button className="btn-primary" onClick={onOpenCreateProject}>
-            + Create New Project
+          <button className="btn-primary" onClick={onOpenCreateProject} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', margin: '0 auto' }}>
+            <Plus size={16} />
+            <span>Create New Project</span>
           </button>
         </div>
       ) : (
@@ -106,7 +117,6 @@ function ProjectsView({
               project.priority === 'High' ? 'priority-high' :
               project.priority === 'Medium' ? 'priority-med' : 'priority-low';
 
-            // Resolve members (supports both predefined member IDs and custom entered names)
             const resolvedMembers = project.members?.map((m) => {
               if (typeof m === 'string') {
                 const found = teamMembers.find(tm => tm.id === m || tm.name.toLowerCase() === m.toLowerCase());
@@ -128,12 +138,12 @@ function ProjectsView({
                         {project.status}
                       </span>
                       <span className={`priority-tag ${priorityClass}`}>
-                        {project.priority === 'High' ? '⇡ High' : project.priority}
+                        {project.priority === 'High' ? '↑ High' : project.priority}
                       </span>
                     </div>
 
                     <button
-                      style={{ color: 'var(--text-subtle)', fontSize: '1.2rem' }}
+                      style={{ color: 'var(--text-subtle)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (window.confirm(`Delete project "${project.name}"?`)) {
@@ -142,7 +152,7 @@ function ProjectsView({
                       }}
                       title="Delete Project"
                     >
-                      ⋮
+                      <Trash2 size={15} style={{ color: 'var(--text-subtle)' }} />
                     </button>
                   </div>
 
@@ -152,6 +162,7 @@ function ProjectsView({
                   
                   {/* Team Leader Badge */}
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <User size={13} style={{ color: 'var(--text-subtle)' }} />
                     <span style={{ fontWeight: 600 }}>Lead:</span>
                     <span>{project.manager || 'Unassigned'}</span>
                   </div>
@@ -200,8 +211,9 @@ function ProjectsView({
                         )}
                       </div>
 
-                      <span className="project-task-stat">
-                        <span>☵</span> {project.completedTasks}/{project.totalTasks || project.completedTasks + 10}
+                      <span className="project-task-stat" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <CheckSquare size={13} style={{ color: 'var(--text-muted)' }} />
+                        <span>{project.completedTasks}/{project.totalTasks || project.completedTasks}</span>
                       </span>
                     </div>
 

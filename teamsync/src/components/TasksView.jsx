@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
+import { Search, Plus, Trash2, Filter, RotateCcw, CheckSquare, ListTodo, User, Calendar } from 'lucide-react';
 
 /**
  * TasksView Component
  * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. JavaScript Array Filtering: Multi-condition filter (Status, Priority, Project, Search text)
- * 2. React State (useState): Managing active filter dropdowns and search query
- * 3. DOM Events: Checkbox toggle for completion, row click for details modal
- * 4. Semantic Table/List: Well-structured task items with priority badges and assignees
+ * High-end enterprise task management table with Lucide React icons.
  */
 function TasksView({
   tasks,
@@ -45,13 +42,13 @@ function TasksView({
       {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
-          <h1>Tasks Management</h1>
-          <p>Track, organize, and prioritize individual deliverables across all projects.</p>
+          <h1>Task Deliverables ({tasks.length})</h1>
+          <p>Track, organize, and prioritize individual task deliverables across all projects.</p>
         </div>
 
         <div className="page-header-actions">
           <div className="nav-search-container" style={{ width: '240px' }}>
-            <span>🔍</span>
+            <Search size={15} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
             <input
               type="text"
               className="nav-search-input"
@@ -61,8 +58,9 @@ function TasksView({
             />
           </div>
 
-          <button className="btn-primary" onClick={() => onOpenCreateTask('TO DO')}>
-            <span>+ Create Task</span>
+          <button className="btn-primary" onClick={() => onOpenCreateTask('TO DO')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Plus size={16} />
+            <span>Create Task</span>
           </button>
         </div>
       </div>
@@ -71,16 +69,22 @@ function TasksView({
       <div style={{
         display: 'flex',
         gap: '12px',
+        alignItems: 'center',
         flexWrap: 'wrap',
         marginBottom: '20px',
-        padding: '16px',
+        padding: '14px 16px',
         background: 'var(--bg-surface)',
         borderRadius: '12px',
         border: '1px solid var(--border)'
       }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>
+          <Filter size={15} />
+          <span>Filter:</span>
+        </div>
+
         <select
           className="form-select"
-          style={{ width: '160px' }}
+          style={{ width: '150px' }}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -93,7 +97,7 @@ function TasksView({
 
         <select
           className="form-select"
-          style={{ width: '160px' }}
+          style={{ width: '150px' }}
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
         >
@@ -105,7 +109,7 @@ function TasksView({
 
         <select
           className="form-select"
-          style={{ width: '200px' }}
+          style={{ width: '180px' }}
           value={projectFilter}
           onChange={(e) => setProjectFilter(e.target.value)}
         >
@@ -118,6 +122,7 @@ function TasksView({
         {(statusFilter !== 'ALL' || priorityFilter !== 'ALL' || projectFilter !== 'ALL' || query) && (
           <button
             className="btn-secondary btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             onClick={() => {
               setStatusFilter('ALL');
               setPriorityFilter('ALL');
@@ -125,7 +130,8 @@ function TasksView({
               setLocalSearch('');
             }}
           >
-            Reset Filters
+            <RotateCcw size={12} />
+            <span>Reset Filters</span>
           </button>
         )}
       </div>
@@ -142,14 +148,18 @@ function TasksView({
               <th>PRIORITY</th>
               <th>STATUS</th>
               <th>DUE DATE</th>
-              <th style={{ width: '60px' }}>ACTIONS</th>
+              <th style={{ width: '80px', textAlign: 'right' }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {filteredTasks.length === 0 ? (
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                  No tasks found matching current filters.
+                <td colSpan="8" style={{ textAlign: 'center', padding: '50px 20px', color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'inline-flex', padding: '14px', borderRadius: '50%', background: 'var(--bg-subtle)', marginBottom: '10px' }}>
+                    <ListTodo size={28} style={{ color: 'var(--text-muted)' }} />
+                  </div>
+                  <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>No tasks found</div>
+                  <div style={{ fontSize: '0.85rem' }}>Try clearing filters or click "+ Create Task" above.</div>
                 </td>
               </tr>
             ) : (
@@ -193,8 +203,8 @@ function TasksView({
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div className="default-avatar-icon" title={task.assigneeName}>
-                          👤
+                        <div className="default-avatar-icon" title={task.assigneeName} style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700 }}>
+                          {task.assigneeName ? task.assigneeName.slice(0, 2).toUpperCase() : <User size={12} />}
                         </div>
                         <span style={{ fontSize: '0.85rem' }}>{task.assigneeName}</span>
                       </div>
@@ -211,17 +221,20 @@ function TasksView({
                       </span>
                     </td>
                     <td>
-                      <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                        {task.dueDate}
+                      <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Calendar size={12} />
+                        <span>{task.dueDate}</span>
                       </span>
                     </td>
-                    <td onClick={(e) => e.stopPropagation()}>
+                    <td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'right' }}>
                       <button
                         className="btn-secondary btn-sm"
-                        style={{ color: 'var(--danger)', borderColor: 'var(--border)', padding: '4px 10px', fontSize: '0.78rem' }}
+                        style={{ color: 'var(--danger)', borderColor: 'var(--border)', padding: '4px 8px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         onClick={() => onDeleteTask(task.id)}
+                        title="Delete task"
                       >
-                        Delete
+                        <Trash2 size={13} />
+                        <span>Delete</span>
                       </button>
                     </td>
                   </tr>

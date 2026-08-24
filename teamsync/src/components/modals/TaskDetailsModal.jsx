@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { X, Trash2, Save, CheckSquare, MessageSquare, Plus, Check } from 'lucide-react';
 
 /**
  * TaskDetailsModal Component
  * ----------------------------------------------------
- * - Interactive modal with full editable task properties
- * - Allows modifying Title, Status, Priority, Assignee, Due Date, and Description
- * - Features checklist subtask management and activity/comments
- * - Provides a prominent "💾 Save Changes" button and "🗑️ Delete Task" action
+ * High-end modal for task inspection, editing, checklists, and comments.
  */
 function TaskDetailsModal({
   task,
@@ -94,7 +92,7 @@ function TaskDetailsModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <select
               style={{
-                padding: '3px 8px',
+                padding: '4px 8px',
                 borderRadius: '6px',
                 border: '1px solid var(--border)',
                 background: 'var(--bg-surface)',
@@ -112,51 +110,41 @@ function TaskDetailsModal({
             </select>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{task.projectName}</span>
           </div>
-          <button className="modal-close-btn" onClick={onClose}>&times;</button>
+          <button className="modal-close-btn" onClick={onClose} title="Close">
+            <X size={18} />
+          </button>
         </div>
 
         {/* Modal Body */}
         <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Editable Title */}
-          <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-              Task Title
-            </label>
+          <div className="form-group">
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Task Title</label>
             <input
               type="text"
               className="form-input"
-              style={{ fontSize: '1.2rem', fontWeight: 700, padding: '8px 12px' }}
+              style={{ fontSize: '1.05rem', fontWeight: 700 }}
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
-              placeholder="Task title..."
             />
           </div>
 
-          {/* 3-Column Meta Grid */}
+          {/* Quick Properties Bar */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '12px',
-            padding: '12px 16px',
+            padding: '12px',
             background: 'var(--bg-subtle)',
-            borderRadius: '10px'
+            borderRadius: '8px'
           }}>
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                Status
+              <label style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                STATUS
               </label>
               <select
-                style={{
-                  marginTop: '4px',
-                  width: '100%',
-                  padding: '6px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg-surface)',
-                  color: 'var(--text-main)',
-                  fontWeight: 600,
-                  fontSize: '0.82rem'
-                }}
+                className="form-select"
+                style={{ fontSize: '0.82rem', padding: '4px 8px' }}
                 value={editedStatus}
                 onChange={(e) => setEditedStatus(e.target.value)}
               >
@@ -168,85 +156,60 @@ function TaskDetailsModal({
             </div>
 
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                Assignee
+              <label style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                ASSIGNEE
               </label>
               <select
-                style={{
-                  marginTop: '4px',
-                  width: '100%',
-                  padding: '6px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg-surface)',
-                  color: 'var(--text-main)',
-                  fontWeight: 600,
-                  fontSize: '0.82rem'
-                }}
+                className="form-select"
+                style={{ fontSize: '0.82rem', padding: '4px 8px' }}
                 value={editedAssigneeId}
                 onChange={(e) => setEditedAssigneeId(e.target.value)}
               >
-                {teamMembers.length > 0 ? (
-                  teamMembers.map(m => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value={task.assigneeId || 'usr-1'}>
-                    {task.assigneeName || 'Sarah Jenkins'}
-                  </option>
-                )}
-                {!teamMembers.some(m => m.id === editedAssigneeId) && task.assigneeName && (
-                  <option value={task.assigneeId || 'usr-custom'}>
-                    {task.assigneeName}
-                  </option>
-                )}
+                <option value="">{task.assigneeName || 'Unassigned'}</option>
+                {teamMembers.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
               </select>
             </div>
 
             <div>
-              <label style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                Due Date
+              <label style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                DUE DATE
               </label>
               <input
                 type="date"
                 className="form-input"
-                style={{
-                  marginTop: '4px',
-                  width: '100%',
-                  padding: '5px 8px',
-                  borderRadius: '6px',
-                  fontSize: '0.82rem',
-                  fontWeight: 600
-                }}
+                style={{ fontSize: '0.82rem', padding: '4px 8px' }}
                 value={editedDueDate}
                 onChange={(e) => setEditedDueDate(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Description Textarea */}
-          <div>
-            <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '6px' }}>
-              Description
-            </label>
+          {/* Editable Description */}
+          <div className="form-group">
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Description & Notes</label>
             <textarea
-              className="form-input"
-              rows={3}
-              style={{ width: '100%', fontSize: '0.88rem', lineHeight: '1.5', padding: '10px 12px', resize: 'vertical' }}
+              className="form-textarea"
+              rows="3"
+              placeholder="Add details, links, or notes..."
               value={editedDescription}
               onChange={(e) => setEditedDescription(e.target.value)}
-              placeholder="Add description notes for this task..."
             />
           </div>
 
-          {/* Subtasks Checklist */}
+          {/* Checklist & Subtasks */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                Checklist ({task.subtasks?.filter(s => s.done).length || 0}/{task.subtasks?.length || 0})
-              </h4>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckSquare size={15} style={{ color: 'var(--primary)' }} />
+                <h4 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                  Checklist & Subtasks
+                </h4>
+              </div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+                {task.subtasks?.filter(s => s.done).length || 0} of {task.subtasks?.length || 0} completed
+              </span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -285,15 +248,21 @@ function TaskDetailsModal({
                 value={newSubtaskText}
                 onChange={(e) => setNewSubtaskText(e.target.value)}
               />
-              <button type="submit" className="btn-secondary btn-sm">Add</button>
+              <button type="submit" className="btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Plus size={13} />
+                <span>Add</span>
+              </button>
             </form>
           </div>
 
           {/* Activity & Comments */}
           <div>
-            <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '10px' }}>
-              Activity & Comments
-            </h4>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <MessageSquare size={15} style={{ color: 'var(--primary)' }} />
+              <h4 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                Activity & Comments
+              </h4>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '160px', overflowY: 'auto' }}>
               {task.comments?.length === 0 ? (
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-subtle)' }}>No comments yet. Be the first to leave one!</p>
@@ -327,7 +296,7 @@ function TaskDetailsModal({
         <div className="modal-footer" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <button
             type="button"
-            style={{ color: 'var(--danger)', fontSize: '0.85rem', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ color: 'var(--danger)', fontSize: '0.85rem', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             onClick={() => {
               if (window.confirm('Are you sure you want to delete this task?')) {
                 onDeleteTask(task.id);
@@ -335,7 +304,8 @@ function TaskDetailsModal({
               }
             }}
           >
-            Delete Task
+            <Trash2 size={14} />
+            <span>Delete Task</span>
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -346,8 +316,10 @@ function TaskDetailsModal({
               type="button"
               className="btn-primary"
               onClick={handleSaveChanges}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              Save Changes
+              <Save size={15} />
+              <span>Save Changes</span>
             </button>
           </div>
         </div>

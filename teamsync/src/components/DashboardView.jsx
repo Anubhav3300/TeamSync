@@ -1,12 +1,30 @@
 import React, { useState } from 'react';
+import {
+  Target,
+  Zap,
+  Clock,
+  FolderKanban,
+  Check,
+  CheckCircle2,
+  Calendar,
+  ListTodo,
+  Plus,
+  Trash2,
+  FolderPlus,
+  UserPlus,
+  Sparkles,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Folder,
+  BarChart2,
+  CheckSquare
+} from 'lucide-react';
 
 /**
  * DashboardView Component
  * ----------------------------------------------------
- * - Clean, streamlined UI without bulky clutter
- * - For New Accounts: Clean welcoming onboarding view with 3 actionable steps & sample data option
- * - For Signed-in / Demo Users: Displays personalized "Recent Left Work" (pending tasks assigned to user),
- *   active projects at a glance, quick 1-click status updates, and task completion toggling.
+ * High-end enterprise dashboard with modern Lucide React icons.
  */
 function DashboardView({
   currentUser,
@@ -22,6 +40,7 @@ function DashboardView({
   onUpdateTaskStatus,
   onOpenCreateProject,
   onOpenCreateTask,
+  onClearAllProjects,
   onLoadSampleData,
   onExportReport
 }) {
@@ -31,7 +50,7 @@ function DashboardView({
 
   const userName = currentUser?.name || 'User';
   const firstName = userName.split(' ')[0];
-  const isNewAccount = currentUser?.isNewAccount && projects.length === 0;
+  const isCleanWorkspace = projects.length === 0;
 
   // Filter tasks assigned to current user
   const userAssignedTasks = tasks.filter(t => {
@@ -42,8 +61,6 @@ function DashboardView({
     return matchId || matchName;
   });
 
-  // If user has direct tasks, use them. If not (e.g. Lead with no assigned subtasks),
-  // fallback gracefully to tasks across projects managed by user or all active tasks.
   const myRelevantTasks = userAssignedTasks.length > 0
     ? userAssignedTasks
     : tasks.filter(t => {
@@ -60,39 +77,40 @@ function DashboardView({
   const allCompletedTasks = tasks.filter(t => t.status === 'DONE');
 
   const activeProjectsCount = projects.filter(p => p.status !== 'Completed').length;
-  
-  // Urgent / Due Soon count
   const urgentTasks = tasks.filter(t => t.status !== 'DONE' && t.priority === 'HIGH');
 
-  // Tasks to display based on active toggle
   const currentTaskList = (taskViewFilter === 'my-tasks' ? myPendingTasks : allPendingTasks);
   const currentCompletedList = (taskViewFilter === 'my-tasks' ? myCompletedTasks : allCompletedTasks);
 
-  // Completion calculation for personal focus ring
   const totalMyTasks = myPendingTasks.length + myCompletedTasks.length;
   const myCompletionRate = totalMyTasks > 0 ? Math.round((myCompletedTasks.length / totalMyTasks) * 100) : 100;
 
   // --------------------------------------------------------------------------
-  // 1. CLEAN ONBOARDING DASHBOARD FOR NEWLY CREATED ACCOUNTS
+  // 1. CLEAN ONBOARDING DASHBOARD FOR FRESH WORKSPACES
   // --------------------------------------------------------------------------
-  if (isNewAccount) {
+  if (isCleanWorkspace) {
     return (
       <div className="page-content">
         {/* Onboarding Hero Banner */}
         <div className="onboarding-hero-card">
-          <div className="onboarding-hero-badge">🚀 Workspace Initialized</div>
-          <h1 className="onboarding-hero-title">Welcome to TeamSync, {firstName}! 🎉</h1>
+          <div className="onboarding-hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Sparkles size={14} />
+            <span>Workspace Initialized</span>
+          </div>
+          <h1 className="onboarding-hero-title">Welcome to TeamSync, {firstName}!</h1>
           <p className="onboarding-hero-sub">
             Your fresh, uncluttered workspace is ready. You can start from scratch with your own projects,
             or load pre-configured sample data to explore all features instantly.
           </p>
 
           <div className="onboarding-hero-actions">
-            <button className="btn-primary" onClick={onOpenCreateProject}>
-              <span>+ Create First Project</span>
+            <button className="btn-primary" onClick={onOpenCreateProject} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Plus size={16} />
+              <span>Create First Project</span>
             </button>
-            <button className="btn-secondary" onClick={onLoadSampleData}>
-              <span>✨ Load Demo Sample Data</span>
+            <button className="btn-secondary" onClick={onLoadSampleData} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Sparkles size={15} style={{ color: 'var(--primary)' }} />
+              <span>Load Demo Sample Data</span>
             </button>
           </div>
         </div>
@@ -101,46 +119,58 @@ function DashboardView({
         <div className="onboarding-steps-grid">
           <div className="onboarding-step-card" onClick={onOpenCreateProject}>
             <div className="onboarding-step-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}>
-              📁
+              <FolderPlus size={24} />
             </div>
             <div className="onboarding-step-number">STEP 1</div>
             <h3>Create a Project</h3>
             <p>Set project milestones, sprint categories, priority, and assign project leads.</p>
-            <span className="onboarding-step-link">+ New Project →</span>
+            <span className="onboarding-step-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span>New Project</span>
+              <ArrowRight size={13} />
+            </span>
           </div>
 
           <div className="onboarding-step-card" onClick={() => onOpenCreateTask('TO DO')}>
             <div className="onboarding-step-icon" style={{ background: '#ECFDF5', color: '#059669' }}>
-              📋
+              <ListTodo size={24} />
             </div>
             <div className="onboarding-step-number">STEP 2</div>
             <h3>Add Your Key Tasks</h3>
             <p>Break down goals into actionable items across To Do, In Progress, Review, and Done.</p>
-            <span className="onboarding-step-link">+ Add Task →</span>
+            <span className="onboarding-step-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span>Add Task</span>
+              <ArrowRight size={13} />
+            </span>
           </div>
 
           <div className="onboarding-step-card" onClick={onNavigateToTeam}>
             <div className="onboarding-step-icon" style={{ background: '#FEF3C7', color: '#D97706' }}>
-              👥
+              <UserPlus size={24} />
             </div>
             <div className="onboarding-step-number">STEP 3</div>
             <h3>Invite Team Members</h3>
             <p>Assign tasks, balance workloads, and track departmental capacity across your team.</p>
-            <span className="onboarding-step-link">Manage Team →</span>
+            <span className="onboarding-step-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span>Manage Team</span>
+              <ArrowRight size={13} />
+            </span>
           </div>
         </div>
 
         {/* Minimal Clean Stats Preview */}
-        <div className="card" style={{ marginTop: '24px', textAlign: 'center', padding: '32px 24px' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✨</div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
+        <div className="card" style={{ marginTop: '24px', textAlign: 'center', padding: '36px 24px' }}>
+          <div style={{ display: 'inline-flex', padding: '12px', borderRadius: '12px', background: 'var(--primary-light)', color: 'var(--primary)', marginBottom: '12px' }}>
+            <Sparkles size={28} />
+          </div>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
             Zero Clutter, Maximum Productivity
           </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '500px', margin: '0 auto 16px auto' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '520px', margin: '0 auto 18px auto' }}>
             As you create projects and assign tasks, your personalized Left Work queue and Kanban boards will populate here automatically.
           </p>
-          <button className="btn-secondary" onClick={onLoadSampleData} style={{ fontSize: '0.88rem' }}>
-            Preview with Sample Projects & Tasks
+          <button className="btn-secondary" onClick={onLoadSampleData} style={{ fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '6px', margin: '0 auto' }}>
+            <Sparkles size={14} />
+            <span>Preview with Sample Projects & Tasks</span>
           </button>
         </div>
       </div>
@@ -148,7 +178,7 @@ function DashboardView({
   }
 
   // --------------------------------------------------------------------------
-  // 2. STREAMLINED DASHBOARD FOR SIGNED IN & DEMO USERS
+  // 2. STREAMLINED DASHBOARD FOR SIGNED IN & ACTIVE USERS
   // --------------------------------------------------------------------------
   return (
     <div className="page-content">
@@ -156,7 +186,7 @@ function DashboardView({
       <div className="page-header">
         <div className="page-title-group">
           <h1>
-            Welcome back, {firstName} <span style={{ fontSize: '1.4rem' }}>👋</span>
+            Welcome back, {firstName}
           </h1>
           <p>
             {myPendingTasks.length > 0
@@ -166,21 +196,34 @@ function DashboardView({
         </div>
 
         <div className="page-header-actions">
-          <button className="btn-secondary" onClick={() => onOpenCreateTask('TO DO')}>
-            <span>+</span> New Task
+          {onClearAllProjects && projects.length > 0 && (
+            <button
+              className="btn-secondary"
+              onClick={onClearAllProjects}
+              style={{ color: '#EF4444', borderColor: 'rgba(239, 68, 68, 0.3)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              title="Clear all projects to start with a fresh empty workspace"
+            >
+              <Trash2 size={14} />
+              <span>Clear All Projects</span>
+            </button>
+          )}
+          <button className="btn-secondary" onClick={() => onOpenCreateTask('TO DO')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Plus size={15} />
+            <span>New Task</span>
           </button>
-          <button className="btn-primary" onClick={onOpenCreateProject}>
-            <span>+</span> New Project
+          <button className="btn-primary" onClick={onOpenCreateProject} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Plus size={16} />
+            <span>New Project</span>
           </button>
         </div>
       </div>
 
-      {/* 4 Focused Key Metric Tiles */}
+      {/* 4 Focused Key Metric Tiles with Lucide Icons */}
       <div className="stats-grid">
         <div className="stat-card" style={{ borderLeft: '4px solid var(--primary)' }}>
           <div className="stat-card-top">
             <div className="stat-icon-wrapper" style={{ background: '#EEF2FF', color: 'var(--primary)' }}>
-              🎯
+              <Target size={20} strokeWidth={2.2} />
             </div>
             <span className="stat-badge positive">Focus</span>
           </div>
@@ -193,7 +236,7 @@ function DashboardView({
         <div className="stat-card" style={{ borderLeft: '4px solid #3B82F6' }}>
           <div className="stat-card-top">
             <div className="stat-icon-wrapper" style={{ background: '#EFF6FF', color: '#3B82F6' }}>
-              ⚡
+              <Zap size={20} strokeWidth={2.2} />
             </div>
             <span className="stat-badge" style={{ background: '#EFF6FF', color: '#2563EB' }}>Active</span>
           </div>
@@ -206,7 +249,7 @@ function DashboardView({
         <div className="stat-card" style={{ borderLeft: '4px solid #F59E0B' }}>
           <div className="stat-card-top">
             <div className="stat-icon-wrapper" style={{ background: '#FEF3C7', color: '#D97706' }}>
-              ⏳
+              <Clock size={20} strokeWidth={2.2} />
             </div>
             <span className="stat-badge" style={{ background: '#FEF3C7', color: '#D97706' }}>Urgent</span>
           </div>
@@ -219,7 +262,7 @@ function DashboardView({
         <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
           <div className="stat-card-top">
             <div className="stat-icon-wrapper" style={{ background: '#ECFDF5', color: '#059669' }}>
-              📁
+              <FolderKanban size={20} strokeWidth={2.2} />
             </div>
             <span className="stat-badge" style={{ background: '#ECFDF5', color: '#059669' }}>Live</span>
           </div>
@@ -238,7 +281,8 @@ function DashboardView({
             <div className="card-header-row" style={{ flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📌</span> Recent Left Work
+                  <ListTodo size={18} style={{ color: 'var(--primary)' }} />
+                  <span>Recent Left Work</span>
                 </h3>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                   Tasks requiring completion or progress updates
@@ -284,7 +328,9 @@ function DashboardView({
                           onToggleTaskComplete(task.id);
                         }}
                       >
-                        <span className="check-mark">✓</span>
+                        <span className="check-mark">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
                       </button>
 
                       {/* Main Task Meta */}
@@ -301,26 +347,29 @@ function DashboardView({
 
                         <div className="recent-task-meta-row">
                           {/* Project Tag */}
-                          <span className="recent-task-project-pill">
-                            📁 {task.projectName}
+                          <span className="recent-task-project-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Folder size={12} />
+                            <span>{task.projectName}</span>
                           </span>
 
                           {/* Subtasks Count if available */}
                           {totalSubtasks > 0 && (
-                            <span className="recent-task-subtasks-pill">
-                              ☑ {completedSubtasks}/{totalSubtasks} subtasks
+                            <span className="recent-task-subtasks-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <CheckSquare size={12} />
+                              <span>{completedSubtasks}/{totalSubtasks} subtasks</span>
                             </span>
                           )}
 
                           {/* Due Date */}
-                          <span className={`recent-task-due ${isHigh ? 'urgent' : ''}`}>
-                            📅 Due {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          <span className={`recent-task-due ${isHigh ? 'urgent' : ''}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Calendar size={12} />
+                            <span>Due {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                           </span>
 
                           {/* Assignee if in All Team view */}
                           {taskViewFilter === 'all-tasks' && task.assigneeName && (
                             <span className="recent-task-assignee-pill">
-                              👤 {task.assigneeName.split(' ')[0]}
+                              {task.assigneeName.split(' ')[0]}
                             </span>
                           )}
                         </div>
@@ -346,17 +395,20 @@ function DashboardView({
               </div>
             ) : (
               <div className="recent-tasks-empty">
-                <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🎉</div>
+                <div style={{ display: 'inline-flex', padding: '14px', borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', marginBottom: '12px' }}>
+                  <CheckCircle2 size={32} />
+                </div>
                 <h4 style={{ fontWeight: 700, color: 'var(--text-main)' }}>You're completely caught up!</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
                   No pending work remaining in this queue.
                 </p>
                 <button
                   className="btn-secondary"
-                  style={{ fontSize: '0.85rem' }}
+                  style={{ fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                   onClick={() => onOpenCreateTask('TO DO')}
                 >
-                  + Add a New Task
+                  <Plus size={14} />
+                  <span>Add a New Task</span>
                 </button>
               </div>
             )}
@@ -367,9 +419,16 @@ function DashboardView({
                 <button
                   className="recent-completed-toggle-btn"
                   onClick={() => setShowCompleted(!showCompleted)}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                 >
-                  <span>✓ Recently Completed ({currentCompletedList.length})</span>
-                  <span>{showCompleted ? '▲ Hide' : '▼ Show'}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={15} style={{ color: 'var(--success)' }} />
+                    <span>Recently Completed ({currentCompletedList.length})</span>
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem' }}>
+                    {showCompleted ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    <span>{showCompleted ? 'Hide' : 'Show'}</span>
+                  </span>
                 </button>
 
                 {showCompleted && (
@@ -388,11 +447,14 @@ function DashboardView({
                             onToggleTaskComplete(task.id);
                           }}
                         >
-                          ✓
+                          <Check size={11} strokeWidth={3} />
                         </button>
                         <div className="recent-completed-info">
                           <span className="recent-completed-title">{task.title}</span>
-                          <span className="recent-completed-proj">📁 {task.projectName}</span>
+                          <span className="recent-completed-proj" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Folder size={11} />
+                            <span>{task.projectName}</span>
+                          </span>
                         </div>
                         <span className="status-pill status-completed">Done</span>
                       </div>
@@ -412,14 +474,16 @@ function DashboardView({
               <div>
                 <h3 className="card-title">Active Projects</h3>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                  Click any project to open Kanban
+                  Ongoing initiatives & progress
                 </p>
               </div>
               <button
                 className="card-action-link"
                 onClick={onNavigateToProjects}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
               >
-                View All →
+                <span>View All</span>
+                <ArrowRight size={13} />
               </button>
             </div>
 
@@ -428,15 +492,17 @@ function DashboardView({
                 <div
                   key={project.id}
                   className="compact-project-card"
-                  onClick={() => onNavigateToKanban(project.id)}
+                  onClick={() => onNavigateToTasks && onNavigateToTasks(project.id)}
                 >
                   <div className="compact-project-top">
-                    <div className="compact-project-icon">{project.icon || '📁'}</div>
+                    <div className="compact-project-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Folder size={16} style={{ color: 'var(--primary)' }} />
+                    </div>
                     <div className="compact-project-title-box">
                       <div className="compact-project-name">{project.name}</div>
                       <div className="compact-project-cat">{project.category}</div>
                     </div>
-                    <span className="compact-project-arrow">→</span>
+                    <ArrowRight size={14} className="compact-project-arrow" />
                   </div>
 
                   <div className="compact-project-progress-wrap">
@@ -461,7 +527,7 @@ function DashboardView({
             </div>
           </div>
 
-          {/* Quick Focus & Shortcuts Card */}
+          {/* Quick Focus & Progress Card */}
           <div className="card">
             <div className="card-header-row">
               <h3 className="card-title">Personal Progress</h3>
@@ -480,24 +546,19 @@ function DashboardView({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
                 className="btn-secondary"
-                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem' }}
+                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}
                 onClick={() => onNavigateToTasks && onNavigateToTasks()}
               >
-                <span>📝</span> Open Task Manager
+                <ListTodo size={16} style={{ color: 'var(--primary)' }} />
+                <span>Open Task Manager</span>
               </button>
               <button
                 className="btn-secondary"
-                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem' }}
-                onClick={onNavigateToCalendar}
-              >
-                <span>📅</span> View Scheduled Deadlines
-              </button>
-              <button
-                className="btn-secondary"
-                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem' }}
+                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}
                 onClick={onExportReport}
               >
-                <span>📊</span> Generate Productivity Report
+                <BarChart2 size={16} style={{ color: 'var(--primary)' }} />
+                <span>Generate Productivity Report</span>
               </button>
             </div>
           </div>
