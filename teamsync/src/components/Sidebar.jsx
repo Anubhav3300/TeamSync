@@ -10,11 +10,6 @@ import {
   Check
 } from 'lucide-react';
 
-/**
- * Sidebar Component
- * ----------------------------------------------------
- * High-end enterprise navigation sidebar with sleek Lucide icons.
- */
 function Sidebar({
   activeTab,
   setActiveTab,
@@ -37,7 +32,6 @@ function Sidebar({
 
   return (
     <aside className="sidebar">
-      {/* Brand Header */}
       <div className="sidebar-header">
         <div className="brand-icon-box">
           <Check size={18} strokeWidth={3} />
@@ -50,7 +44,6 @@ function Sidebar({
         </div>
       </div>
 
-      {/* Main Nav Items */}
       <nav className="sidebar-nav">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -71,7 +64,6 @@ function Sidebar({
         })}
       </nav>
 
-      {/* Footer Nav */}
       <div className="sidebar-footer">
         {bottomItems.map((item) => {
           const Icon = item.icon;
@@ -90,7 +82,6 @@ function Sidebar({
 
         <div className="sidebar-divider" />
 
-        {/* Sign Out Button */}
         <div style={{ padding: '0 4px' }}>
           <button
             className="btn-secondary btn-sm"

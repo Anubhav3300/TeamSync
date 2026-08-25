@@ -13,11 +13,6 @@ import {
   Shield
 } from 'lucide-react';
 
-/**
- * SettingsView Component
- * ----------------------------------------------------
- * High-end enterprise workspace settings & governance with Lucide icons.
- */
 function SettingsView({
   currentUser,
   setCurrentUser,
@@ -73,7 +68,6 @@ function SettingsView({
 
   return (
     <div className="page-content">
-      {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
           <h1>Workspace Settings & Governance</h1>
@@ -81,7 +75,6 @@ function SettingsView({
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="projects-filter-bar">
         {[
           { id: 'general', label: 'General Profile', icon: User },
@@ -103,7 +96,6 @@ function SettingsView({
         })}
       </div>
 
-      {/* Tab: General */}
       {activeTab === 'general' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div className="card">
@@ -154,7 +146,6 @@ function SettingsView({
             </form>
           </div>
 
-          {/* Workspace Data Management (Clear / Restore) */}
           <div className="card">
             <h3 className="card-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sliders size={18} style={{ color: 'var(--primary)' }} />
@@ -214,7 +205,6 @@ function SettingsView({
         </div>
       )}
 
-      {/* Tab: RBAC & Permissions */}
       {activeTab === 'rbac' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div className="card">
@@ -275,7 +265,6 @@ function SettingsView({
         </div>
       )}
 
-      {/* Tab: Automations */}
       {activeTab === 'automations' && (
         <div className="card">
           <h3 className="card-title" style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>

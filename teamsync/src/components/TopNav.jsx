@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Search, X, ChevronDown, LogOut, ShieldCheck } from 'lucide-react';
 
-/**
- * TopNav Component
- * ----------------------------------------------------
- * High-end enterprise Top Navigation Bar with Lucide React Icons.
- */
 function TopNav({
   searchQuery,
   setSearchQuery,
@@ -17,7 +12,6 @@ function TopNav({
 
   return (
     <header className="top-nav">
-      {/* Global Search Bar */}
       <div className="nav-search-container">
         <Search size={16} className="text-muted" style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
         <input
@@ -46,9 +40,7 @@ function TopNav({
         )}
       </div>
 
-      {/* Right Actions */}
       <div className="top-nav-right">
-        {/* User Profile Dropdown */}
         <div style={{ position: 'relative' }}>
           <button
             className="user-profile-btn"

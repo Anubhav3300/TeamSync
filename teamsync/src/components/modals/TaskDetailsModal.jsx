@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, Save, CheckSquare, MessageSquare, Plus, Check } from 'lucide-react';
 
-/**
- * TaskDetailsModal Component
- * ----------------------------------------------------
- * High-end modal for task inspection, editing, checklists, and comments.
- */
 function TaskDetailsModal({
   task,
   isOpen,
@@ -29,7 +24,6 @@ function TaskDetailsModal({
   const [commentText, setCommentText] = useState('');
   const [newSubtaskText, setNewSubtaskText] = useState('');
 
-  // Sync state whenever task changes or modal opens
   useEffect(() => {
     if (task) {
       setEditedTitle(task.title || '');
@@ -87,7 +81,6 @@ function TaskDetailsModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" style={{ maxWidth: '640px' }} onClick={(e) => e.stopPropagation()}>
-        {/* Modal Header */}
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <select
@@ -115,9 +108,7 @@ function TaskDetailsModal({
           </button>
         </div>
 
-        {/* Modal Body */}
         <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Editable Title */}
           <div className="form-group">
             <label className="form-label" style={{ fontSize: '0.75rem' }}>Task Title</label>
             <input
@@ -129,7 +120,6 @@ function TaskDetailsModal({
             />
           </div>
 
-          {/* Quick Properties Bar */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
@@ -186,7 +176,6 @@ function TaskDetailsModal({
             </div>
           </div>
 
-          {/* Editable Description */}
           <div className="form-group">
             <label className="form-label" style={{ fontSize: '0.75rem' }}>Description & Notes</label>
             <textarea
@@ -198,7 +187,6 @@ function TaskDetailsModal({
             />
           </div>
 
-          {/* Checklist & Subtasks */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -255,7 +243,6 @@ function TaskDetailsModal({
             </form>
           </div>
 
-          {/* Activity & Comments */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
               <MessageSquare size={15} style={{ color: 'var(--primary)' }} />
@@ -292,7 +279,6 @@ function TaskDetailsModal({
           </div>
         </div>
 
-        {/* Modal Footer with Save Changes & Delete */}
         <div className="modal-footer" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <button
             type="button"

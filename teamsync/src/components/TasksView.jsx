@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, Trash2, Filter, RotateCcw, CheckSquare, ListTodo, User, Calendar } from 'lucide-react';
 
-/**
- * TasksView Component
- * ----------------------------------------------------
- * High-end enterprise task management table with Lucide React icons.
- */
 function TasksView({
   tasks,
   projects,
@@ -39,7 +34,6 @@ function TasksView({
 
   return (
     <div className="page-content">
-      {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
           <h1>Task Deliverables ({tasks.length})</h1>
@@ -65,7 +59,6 @@ function TasksView({
         </div>
       </div>
 
-      {/* Filters Bar */}
       <div style={{
         display: 'flex',
         gap: '12px',
@@ -136,7 +129,6 @@ function TasksView({
         )}
       </div>
 
-      {/* Tasks Table */}
       <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
         <table className="projects-table">
           <thead>

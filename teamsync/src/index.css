@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Light Theme (Default TeamSync) */
+  
   --bg-app: #F8FAFC;
   --bg-surface: #FFFFFF;
   --bg-subtle: #F1F5F9;
@@ -31,7 +31,7 @@
 }
 
 [data-theme='dark'] {
-  /* Dark Theme Command Mode */
+  
   --bg-app: #09090B;
   --bg-surface: #121215;
   --bg-subtle: #18181B;
@@ -95,16 +95,12 @@ a {
   text-decoration: none;
 }
 
-/* ==========================================================================
-   APP WORKSPACE LAYOUT
-   ========================================================================== */
 .app-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--bg-app);
 }
 
-/* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
   background: var(--bg-sidebar);
@@ -233,7 +229,6 @@ a {
   gap: 4px;
 }
 
-/* Main Content Area */
 .main-wrapper {
   flex: 1;
   display: flex;
@@ -242,7 +237,6 @@ a {
   background: var(--bg-app);
 }
 
-/* Top Nav Bar */
 .top-nav {
   height: 68px;
   background: var(--bg-surface);
@@ -380,7 +374,6 @@ a {
   font-weight: 500;
 }
 
-/* Page Body */
 .page-content {
   padding: 32px;
   flex: 1;
@@ -417,7 +410,6 @@ a {
   gap: 12px;
 }
 
-/* General Buttons */
 .btn-primary {
   background: var(--primary);
   color: white;
@@ -459,9 +451,6 @@ a {
   border-radius: 6px;
 }
 
-/* ==========================================================================
-   DASHBOARD VIEW (Matches Screenshot 4)
-   ========================================================================== */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -536,7 +525,6 @@ a {
   line-height: 1;
 }
 
-/* Dashboard Two-Column Layout */
 .dashboard-content-grid {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -586,7 +574,6 @@ a {
   text-decoration: underline;
 }
 
-/* Projects Table */
 .projects-table {
   width: 100%;
   border-collapse: collapse;
@@ -676,7 +663,6 @@ a {
   width: 32px;
 }
 
-/* Status Badges */
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -730,7 +716,6 @@ a {
   gap: 4px;
 }
 
-/* Task Distribution Chart Widget */
 .donut-chart-container {
   display: flex;
   flex-direction: column;
@@ -789,7 +774,6 @@ a {
   border-radius: 3px;
 }
 
-/* Team Workload Widget */
 .workload-list {
   display: flex;
   flex-direction: column;
@@ -871,11 +855,6 @@ a {
   background: var(--danger);
 }
 
-/* ==========================================================================
-   STREAMLINED DASHBOARD & RECENT LEFT WORK STYLES
-   ========================================================================== */
-
-/* 1. Onboarding State */
 .onboarding-hero-card {
   background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(99, 102, 241, 0.02) 100%);
   border: 1px solid rgba(79, 70, 229, 0.2);
@@ -985,7 +964,6 @@ a {
   color: var(--primary);
 }
 
-/* 2. Task Filter Tabs */
 .dashboard-task-filter-tabs {
   display: flex;
   align-items: center;
@@ -1011,7 +989,6 @@ a {
   font-weight: 700;
 }
 
-/* 3. Recent Left Work List */
 .recent-tasks-container {
   display: flex;
   flex-direction: column;
@@ -1150,7 +1127,6 @@ a {
   border-radius: 12px;
 }
 
-/* 4. Collapsible Completed Section */
 .recent-completed-section {
   margin-top: 18px;
   border-top: 1px solid var(--border);
@@ -1230,7 +1206,6 @@ a {
   color: var(--text-subtle);
 }
 
-/* 5. Compact Projects Widget */
 .compact-projects-list {
   display: flex;
   flex-direction: column;
@@ -1322,9 +1297,6 @@ a {
   font-weight: 500;
 }
 
-/* ==========================================================================
-   PROJECTS VIEW (Matches Screenshot 3)
-   ========================================================================== */
 .projects-filter-bar {
   display: flex;
   align-items: center;
@@ -1496,9 +1468,6 @@ a {
   gap: 4px;
 }
 
-/* ==========================================================================
-   KANBAN BOARD VIEW (Matches Screenshot 5)
-   ========================================================================== */
 .kanban-board-container {
   display: flex;
   gap: 20px;
@@ -1665,7 +1634,6 @@ a {
   border-color: var(--primary);
 }
 
-/* Move Column Arrows for easy interaction */
 .kanban-quick-actions {
   display: flex;
   align-items: center;
@@ -1691,9 +1659,6 @@ a {
   border-color: var(--primary);
 }
 
-/* ==========================================================================
-   AUTH SCREEN (Matches Screenshot 2)
-   ========================================================================== */
 .auth-page-container {
   display: flex;
   min-height: 100vh;
@@ -2053,9 +2018,6 @@ a {
   color: var(--primary);
 }
 
-/* ==========================================================================
-   LANDING PAGE (Matches Screenshot 1)
-   ========================================================================== */
 .landing-body {
   background-color: #000000;
   color: #FFFFFF;
@@ -2130,9 +2092,6 @@ a {
   border-color: #71717A;
 }
 
-/* ==========================================================================
-   MODALS
-   ========================================================================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -2280,7 +2239,6 @@ a {
   border: 1px solid var(--border);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -2291,9 +2249,6 @@ a {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* ==========================================================================
-   RESPONSIVE DESIGN
-   ========================================================================== */
 @media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -2344,9 +2299,6 @@ a {
   }
 }
 
-/* ==========================================================================
-   LANDING PAGE STYLES (Clean, Semantic, Student Project Alignment)
-   ========================================================================== */
 .landing-page {
   position: relative;
   background-color: var(--bg-app);
@@ -2356,7 +2308,6 @@ a {
   overflow-x: hidden;
 }
 
-/* Fixed Classy Background (stays static while scrolling) */
 .landing-fixed-bg {
   position: fixed;
   top: 0;
@@ -2429,7 +2380,6 @@ a {
   opacity: 0.9;
 }
 
-/* Ensure landing contents render above fixed background */
 .landing-header,
 .landing-page main,
 .landing-footer {
@@ -2443,7 +2393,6 @@ a {
   padding: 0 24px;
 }
 
-/* 1. Header & Navigation */
 .landing-header {
   position: sticky;
   top: 0;
@@ -2530,7 +2479,6 @@ a {
   transform: translateY(-1px);
 }
 
-/* 2. Hero Section */
 .landing-hero-section {
   padding: 80px 0 60px;
   text-align: center;
@@ -2618,7 +2566,6 @@ a {
   border-color: var(--text-subtle);
 }
 
-/* Interactive Preview Card */
 .landing-preview-card {
   max-width: 900px;
   margin: 0 auto;
@@ -2766,7 +2713,6 @@ a {
   color: var(--text-muted);
 }
 
-/* 3. Section Common Layout */
 .landing-section {
   padding: 80px 0;
 }
@@ -2806,7 +2752,6 @@ a {
   line-height: 1.6;
 }
 
-/* 4. Features Grid */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -2846,7 +2791,6 @@ a {
   line-height: 1.6;
 }
 
-/* 5. How It Works Steps */
 .steps-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -2887,7 +2831,6 @@ a {
   line-height: 1.6;
 }
 
-/* 6. Tech Stack Grid */
 .tech-stack-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -2926,7 +2869,6 @@ a {
   line-height: 1.5;
 }
 
-/* 7. FAQ Accordion */
 .faq-container {
   max-width: 800px;
   margin: 0 auto;
@@ -2983,7 +2925,6 @@ a {
   line-height: 1.6;
 }
 
-/* 8. Clean & Simple CTA Section */
 .landing-cta-section {
   padding: 60px 0 70px;
 }
@@ -3026,7 +2967,6 @@ a {
   flex-wrap: wrap;
 }
 
-/* 9. Professional Enterprise Footer */
 .landing-footer {
   background: var(--bg-surface);
   border-top: 1px solid var(--border);
@@ -3170,7 +3110,6 @@ a {
   opacity: 0.4;
 }
 
-/* Landing Responsive Styles */
 @media (max-width: 900px) {
   .footer-main-grid {
     grid-template-columns: 1fr 1fr;
@@ -3233,5 +3172,4 @@ a {
     gap: 12px;
   }
 }
-
 

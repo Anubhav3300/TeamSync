@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, Trash2, Folder, FolderPlus, MoreVertical, CheckSquare, Sparkles, User } from 'lucide-react';
 
-/**
- * ProjectsView Component
- * ----------------------------------------------------
- * High-end enterprise projects catalog with Lucide icons.
- */
 function ProjectsView({
   projects,
   onOpenCreateProject,
@@ -21,7 +16,6 @@ function ProjectsView({
 
   const query = searchQuery || localSearch;
 
-  // Filter projects by tab status & search term
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -39,7 +33,6 @@ function ProjectsView({
 
   return (
     <div className="page-content">
-      {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
           <h1>Projects ({projects.length})</h1>
@@ -65,7 +58,6 @@ function ProjectsView({
         </div>
       </div>
 
-      {/* Filter Tabs */}
       <div className="projects-filter-bar">
         {['All Projects', 'Active', 'Completed', 'On Hold'].map((tab) => (
           <button
@@ -78,7 +70,6 @@ function ProjectsView({
         ))}
       </div>
 
-      {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--bg-surface)', borderRadius: '14px', border: '1px dashed var(--border)' }}>
           <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', marginBottom: '14px' }}>
@@ -118,7 +109,6 @@ function ProjectsView({
             return (
               <div key={project.id} className="project-card">
                 <div>
-                  {/* Card Header */}
                   <div className="project-card-header">
                     <div className="project-card-badges">
                       <span className={`status-pill ${statusClass}`}>
@@ -144,11 +134,9 @@ function ProjectsView({
                     </button>
                   </div>
 
-                  {/* Title & Description */}
                   <h3 className="project-card-title">{project.name}</h3>
                   <p className="project-card-desc">{project.description}</p>
                   
-                  {/* Team Leader Badge */}
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <User size={13} style={{ color: 'var(--text-subtle)' }} />
                     <span style={{ fontWeight: 600 }}>Lead:</span>
@@ -157,7 +145,6 @@ function ProjectsView({
                 </div>
 
                 <div>
-                  {/* Progress Bar */}
                   <div className="project-card-progress">
                     <div className="project-progress-header">
                       <span className="project-progress-label">Progress</span>
@@ -176,7 +163,6 @@ function ProjectsView({
                     </div>
                   </div>
 
-                  {/* Card Footer */}
                   <div className="project-card-footer">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div className="avatar-stack">

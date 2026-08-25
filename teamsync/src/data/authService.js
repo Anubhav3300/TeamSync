@@ -1,14 +1,7 @@
-/**
- * TeamSync Simple Auth Service & LocalStorage Persistence
- * --------------------------------------------------------
- * Manages user registration, sign-in validation, and session persistence
- * in a clean, simple, lightweight React-friendly way.
- */
 
 const USERS_STORAGE_KEY = 'teamsync_registered_users';
 const CURRENT_USER_KEY = 'teamsync_active_session';
 
-// Preloaded demo users available right away
 export const DEFAULT_USERS = [
   {
     id: 'usr-1',
@@ -56,10 +49,6 @@ export const DEFAULT_USERS = [
   }
 ];
 
-/**
- * Retrieve all registered users from localStorage (or fallback to defaults)
- * Always merges in latest DEFAULT_USERS so updated credentials like Rohan Verma always work.
- */
 export function getRegisteredUsers() {
   try {
     const data = localStorage.getItem(USERS_STORAGE_KEY);
@@ -71,10 +60,8 @@ export function getRegisteredUsers() {
       }
     }
 
-    // Clean out old legacy demo user if present
     const cleanUsers = users.filter(u => u.email.toLowerCase() !== 'sarah.j@teamsync.io');
 
-    // Ensure each DEFAULT_USER exists with latest properties
     DEFAULT_USERS.forEach(defaultUser => {
       const index = cleanUsers.findIndex(
         u => u.id === defaultUser.id || u.email.toLowerCase() === defaultUser.email.toLowerCase()
@@ -93,9 +80,6 @@ export function getRegisteredUsers() {
   }
 }
 
-/**
- * Register a new user
- */
 export function registerUser({ name, email, password, role = 'Project Manager' }) {
   if (!name || !name.trim()) {
     return { success: false, error: 'Please enter your full name.' };
@@ -119,7 +103,6 @@ export function registerUser({ name, email, password, role = 'Project Manager' }
     return { success: false, error: 'An account with this email already exists. Please sign in instead.' };
   }
 
-  // Determine systemRole
   let systemRole = 'Developer';
   if (role.toLowerCase().includes('manager') || role.toLowerCase().includes('admin')) {
     systemRole = 'Admin';
@@ -152,9 +135,6 @@ export function registerUser({ name, email, password, role = 'Project Manager' }
   return { success: true, user: newUser };
 }
 
-/**
- * Sign in a user with email & password
- */
 export function authenticateUser(email, password) {
   if (!email || !email.trim()) {
     return { success: false, error: 'Please enter your email address.' };
@@ -188,9 +168,6 @@ export function authenticateUser(email, password) {
   return { success: true, user };
 }
 
-/**
- * Get active session
- */
 export function getStoredSession() {
   try {
     const raw = localStorage.getItem(CURRENT_USER_KEY);
@@ -200,9 +177,6 @@ export function getStoredSession() {
   }
 }
 
-/**
- * Save active session
- */
 export function saveStoredSession(user) {
   try {
     if (user) {
@@ -215,9 +189,6 @@ export function saveStoredSession(user) {
   }
 }
 
-/**
- * Clear session
- */
 export function clearStoredSession() {
   try {
     localStorage.removeItem(CURRENT_USER_KEY);

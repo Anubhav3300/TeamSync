@@ -21,13 +21,8 @@ import {
   Shield
 } from 'lucide-react';
 
-/**
- * AuthView Component (Sign In & Sign Up)
- * ----------------------------------------------------
- * High-end enterprise Authentication View with Lucide React icons.
- */
 function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
-  const [mode, setMode] = useState(initialMode); // 'login' | 'register'
+  const [mode, setMode] = useState(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,21 +32,18 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Sync mode if initialMode prop changes
   useEffect(() => {
     setMode(initialMode);
     setErrorMsg('');
     setSuccessMsg('');
   }, [initialMode]);
 
-  // Handle Sign In / Sign Up Form Submission
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
     if (mode === 'register') {
-      // 1. Sign Up Logic
       const result = registerUser({ name, email, password, role });
       if (!result.success) {
         setErrorMsg(result.error);
@@ -63,7 +55,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
         onLogin(result.user, rememberMe);
       }, 500);
     } else {
-      // 2. Sign In Logic
       const result = authenticateUser(email, password);
       if (!result.success) {
         setErrorMsg(result.error);
@@ -77,20 +68,18 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
     }
   };
 
-  // Instant 1-Click Demo Logins
   const handleDemoLogin = (userKey) => {
     setErrorMsg('');
     setSuccessMsg('');
-    let demoUser = DEFAULT_USERS[0]; // Rohan (Admin/PM)
+    let demoUser = DEFAULT_USERS[0];
     if (userKey === 'david') {
-      demoUser = DEFAULT_USERS[1]; // David (Lead Dev)
+      demoUser = DEFAULT_USERS[1];
     } else if (userKey === 'elena') {
-      demoUser = DEFAULT_USERS[2]; // Elena (UX Designer)
+      demoUser = DEFAULT_USERS[2];
     }
     onLogin(demoUser, rememberMe);
   };
 
-  // Autofill form with demo credentials for testing
   const handleFillDemoCredentials = (demoUser) => {
     setErrorMsg('');
     setSuccessMsg('');
@@ -101,7 +90,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
 
   return (
     <div className="auth-page-container">
-      {/* Left Branding Banner */}
       <div className="auth-banner-col">
         <div>
           <button
@@ -126,7 +114,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
           </p>
         </div>
 
-        {/* Live Preview Card */}
         <div className="auth-mockup-card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#4F46E5', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -153,10 +140,8 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
         </div>
       </div>
 
-      {/* Right Form Column */}
       <div className="auth-form-col">
         <div className="auth-form-wrapper">
-          {/* Back to Home Button */}
           <button
             type="button"
             className="btn-auth-back"
@@ -167,7 +152,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             <span>Back to Home</span>
           </button>
 
-          {/* Segmented Mode Switcher (Sign In vs Sign Up) */}
           <div className="auth-tab-switch">
             <button
               type="button"
@@ -208,7 +192,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             </p>
           </div>
 
-          {/* Error Message Banner */}
           {errorMsg && (
             <div style={{
               padding: '12px 16px',
@@ -228,7 +211,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             </div>
           )}
 
-          {/* Success Message Banner */}
           {successMsg && (
             <div style={{
               padding: '12px 16px',
@@ -248,7 +230,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
             </div>
           )}
 
-          {/* Authentication Form */}
           <form onSubmit={handleSubmit}>
             {mode === 'register' && (
               <div className="auth-form-group">
@@ -353,7 +334,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
               <ArrowRight size={16} />
             </button>
 
-            {/* Autofill Demo Hint (for users wanting to test standard Sign In) */}
             {mode === 'login' && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
                 <button
@@ -381,7 +361,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
               <span>Or 1-click demo access</span>
             </div>
 
-            {/* Quick Demo Access Bar */}
             <div className="demo-roles-box" style={{ marginTop: '8px' }}>
               <div className="demo-roles-title" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <Zap size={13} style={{ color: 'var(--primary)' }} />
@@ -421,7 +400,6 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
               </div>
             </div>
 
-            {/* Toggle Prompt */}
             <div className="auth-toggle-prompt">
               {mode === 'login' ? (
                 <>

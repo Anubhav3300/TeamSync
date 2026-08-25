@@ -1,11 +1,3 @@
-/**
- * TeamSync Mock Data Store
- * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. JavaScript Data Structures: Exported Arrays of Objects (initialTeamMembers, initialProjects, initialTasks, initialNotifications)
- * 2. Clean ES6 Module Exports: export const ...
- * 3. Structured properties matching UI models (IDs, categories, status enums, dates, arrays of subtasks)
- */
 
 export const initialTeamMembers = [
   {
@@ -395,6 +387,6 @@ export const initialCurrentUser = {
   name: 'Rohan Verma',
   email: 'rohan.v@teamsync.io',
   role: 'Project Manager',
-  systemRole: 'Admin', // 'Admin' | 'Project Manager' | 'Developer' | 'Designer'
+  systemRole: 'Admin',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
 };

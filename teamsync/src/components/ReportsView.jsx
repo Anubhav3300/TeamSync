@@ -1,11 +1,6 @@
 import React from 'react';
 import { Target, Zap, Clock, AlertTriangle, TrendingUp, BarChart3 } from 'lucide-react';
 
-/**
- * ReportsView Component
- * ----------------------------------------------------
- * High-end enterprise analytics and reporting dashboard with Lucide icons.
- */
 function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
   const completedTasks = tasks.filter(t => t.status === 'DONE').length;
   const inProgressTasks = tasks.filter(t => t.status === 'IN PROGRESS').length;
@@ -15,7 +10,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
 
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 100;
 
-  // Velocity history across sprints
   const sprintVelocity = [
     { sprint: 'Sprint 20', committed: 38, completed: 35 },
     { sprint: 'Sprint 21', committed: 42, completed: 40 },
@@ -26,7 +20,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
 
   return (
     <div className="page-content">
-      {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
           <h1>Productivity & Velocity Reports</h1>
@@ -34,7 +27,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
         </div>
       </div>
 
-      {/* Metric Cards */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-card-top">
@@ -92,7 +84,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        {/* Sprint Velocity Chart */}
         <div className="card">
           <h3 className="card-title" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <BarChart3 size={18} style={{ color: 'var(--primary)' }} />
@@ -122,7 +113,6 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
           </div>
         </div>
 
-        {/* Project Health Status */}
         <div className="card">
           <h3 className="card-title" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Target size={18} style={{ color: 'var(--primary)' }} />

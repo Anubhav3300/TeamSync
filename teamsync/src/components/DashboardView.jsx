@@ -21,11 +21,6 @@ import {
   CheckSquare
 } from 'lucide-react';
 
-/**
- * DashboardView Component
- * ----------------------------------------------------
- * High-end enterprise dashboard with modern Lucide React icons.
- */
 function DashboardView({
   currentUser,
   projects = [],
@@ -34,7 +29,6 @@ function DashboardView({
   onNavigateToProjects,
   onNavigateToTasks,
   onNavigateToTeam,
-  onNavigateToCalendar,
   onTaskClick,
   onToggleTaskComplete,
   onUpdateTaskStatus,
@@ -44,7 +38,6 @@ function DashboardView({
   onLoadSampleData,
   onExportReport
 }) {
-  // Task filter mode: 'my-tasks' (assigned to current user) | 'all-tasks'
   const [taskViewFilter, setTaskViewFilter] = useState('my-tasks');
   const [showCompleted, setShowCompleted] = useState(false);
 
@@ -52,7 +45,6 @@ function DashboardView({
   const firstName = userName.split(' ')[0];
   const isCleanWorkspace = projects.length === 0;
 
-  // Filter tasks assigned to current user
   const userAssignedTasks = tasks.filter(t => {
     if (!currentUser) return false;
     const matchId = t.assigneeId === currentUser.id;
@@ -68,7 +60,6 @@ function DashboardView({
       return isManager || currentUser?.systemRole === 'Admin';
     });
 
-  // Calculate left work (pending tasks)
   const myPendingTasks = myRelevantTasks.filter(t => t.status !== 'DONE');
   const myCompletedTasks = myRelevantTasks.filter(t => t.status === 'DONE');
   const myInProgressTasks = myRelevantTasks.filter(t => t.status === 'IN PROGRESS');
@@ -85,13 +76,9 @@ function DashboardView({
   const totalMyTasks = myPendingTasks.length + myCompletedTasks.length;
   const myCompletionRate = totalMyTasks > 0 ? Math.round((myCompletedTasks.length / totalMyTasks) * 100) : 100;
 
-  // --------------------------------------------------------------------------
-  // 1. CLEAN ONBOARDING DASHBOARD FOR FRESH WORKSPACES
-  // --------------------------------------------------------------------------
   if (isCleanWorkspace) {
     return (
       <div className="page-content">
-        {/* Onboarding Hero Banner */}
         <div className="onboarding-hero-card">
           <div className="onboarding-hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <Sparkles size={14} />
@@ -115,7 +102,6 @@ function DashboardView({
           </div>
         </div>
 
-        {/* 3 Quick Starter Step Cards */}
         <div className="onboarding-steps-grid">
           <div className="onboarding-step-card" onClick={onOpenCreateProject}>
             <div className="onboarding-step-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}>
@@ -157,7 +143,6 @@ function DashboardView({
           </div>
         </div>
 
-        {/* Minimal Clean Stats Preview */}
         <div className="card" style={{ marginTop: '24px', textAlign: 'center', padding: '36px 24px' }}>
           <div style={{ display: 'inline-flex', padding: '12px', borderRadius: '12px', background: 'var(--primary-light)', color: 'var(--primary)', marginBottom: '12px' }}>
             <Sparkles size={28} />
@@ -177,12 +162,8 @@ function DashboardView({
     );
   }
 
-  // --------------------------------------------------------------------------
-  // 2. STREAMLINED DASHBOARD FOR SIGNED IN & ACTIVE USERS
-  // --------------------------------------------------------------------------
   return (
     <div className="page-content">
-      {/* Header Row */}
       <div className="page-header">
         <div className="page-title-group">
           <h1>
@@ -207,7 +188,6 @@ function DashboardView({
         </div>
       </div>
 
-      {/* 4 Focused Key Metric Tiles with Lucide Icons */}
       <div className="stats-grid">
         <div className="stat-card" style={{ borderLeft: '4px solid var(--primary)' }}>
           <div className="stat-card-top">
@@ -262,9 +242,7 @@ function DashboardView({
         </div>
       </div>
 
-      {/* Main 2-Column Dashboard Grid */}
       <div className="dashboard-content-grid">
-        {/* Left Column: Recent Left Work Queue */}
         <div className="dashboard-main-col">
           <div className="card">
             <div className="card-header-row" style={{ flexWrap: 'wrap', gap: '12px' }}>
@@ -278,7 +256,6 @@ function DashboardView({
                 </p>
               </div>
 
-              {/* Filter Tabs */}
               <div className="dashboard-task-filter-tabs">
                 <button
                   className={`dashboard-filter-tab-btn ${taskViewFilter === 'my-tasks' ? 'active' : ''}`}
@@ -295,7 +272,6 @@ function DashboardView({
               </div>
             </div>
 
-            {/* Task Items List */}
             {currentTaskList.length > 0 ? (
               <div className="recent-tasks-container">
                 {currentTaskList.map((task) => {
@@ -308,7 +284,6 @@ function DashboardView({
                       key={task.id}
                       className="recent-task-row"
                     >
-                      {/* Checkbox circle to complete */}
                       <button
                         className="recent-task-check"
                         title="Mark as complete"
@@ -322,7 +297,6 @@ function DashboardView({
                         </span>
                       </button>
 
-                      {/* Main Task Meta */}
                       <div
                         className="recent-task-main"
                         onClick={() => onTaskClick && onTaskClick(task)}
@@ -335,13 +309,11 @@ function DashboardView({
                         </div>
 
                         <div className="recent-task-meta-row">
-                          {/* Project Tag */}
                           <span className="recent-task-project-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                             <Folder size={12} />
                             <span>{task.projectName}</span>
                           </span>
 
-                          {/* Subtasks Count if available */}
                           {totalSubtasks > 0 && (
                             <span className="recent-task-subtasks-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                               <CheckSquare size={12} />
@@ -349,13 +321,11 @@ function DashboardView({
                             </span>
                           )}
 
-                          {/* Due Date */}
                           <span className={`recent-task-due ${isHigh ? 'urgent' : ''}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                             <Calendar size={12} />
                             <span>Due {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                           </span>
 
-                          {/* Assignee if in All Team view */}
                           {taskViewFilter === 'all-tasks' && task.assigneeName && (
                             <span className="recent-task-assignee-pill">
                               {task.assigneeName.split(' ')[0]}
@@ -364,7 +334,6 @@ function DashboardView({
                         </div>
                       </div>
 
-                      {/* Status Selector Dropdown */}
                       <div className="recent-task-actions">
                         <select
                           className="recent-task-status-select"
@@ -402,7 +371,6 @@ function DashboardView({
               </div>
             )}
 
-            {/* Collapsible Recently Completed Work */}
             {currentCompletedList.length > 0 && (
               <div className="recent-completed-section">
                 <button
@@ -455,9 +423,7 @@ function DashboardView({
           </div>
         </div>
 
-        {/* Right Column: Active Projects & Quick Shortcuts */}
         <div className="dashboard-side-col">
-          {/* Active Projects Widget */}
           <div className="card">
             <div className="card-header-row">
               <div>
@@ -516,7 +482,6 @@ function DashboardView({
             </div>
           </div>
 
-          {/* Quick Focus & Progress Card */}
           <div className="card">
             <div className="card-header-row">
               <h3 className="card-title">Personal Progress</h3>

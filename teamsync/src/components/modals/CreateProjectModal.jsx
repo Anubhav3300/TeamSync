@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, FolderPlus } from 'lucide-react';
 
-/**
- * CreateProjectModal Component
- * ----------------------------------------------------
- * High-end modal for creating new initiatives with Lucide icons.
- */
 function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Product Engineering');
@@ -80,7 +75,6 @@ function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] })
 
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-            {/* Project Name */}
             <div className="form-group">
               <label className="form-label">Project Name *</label>
               <input
@@ -94,7 +88,6 @@ function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] })
               />
             </div>
 
-            {/* Category & Priority */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Category</label>
@@ -126,7 +119,6 @@ function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] })
               </div>
             </div>
 
-            {/* Manager / Leader & Due Date */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Team Leader / Manager *</label>
@@ -157,7 +149,6 @@ function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] })
               </div>
             </div>
 
-            {/* Project Description */}
             <div className="form-group">
               <label className="form-label">Project Scope & Goals</label>
               <textarea
@@ -169,7 +160,6 @@ function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] })
               />
             </div>
 
-            {/* Team Members Tag Builder */}
             <div className="form-group">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                 <label className="form-label" style={{ marginBottom: 0 }}>Project Team Members</label>
@@ -209,7 +199,6 @@ function CreateProjectModal({ isOpen, onClose, onAddProject, teamMembers = [] })
                 </button>
               </div>
 
-              {/* Quick suggestions from existing team members not yet added */}
               {Array.isArray(teamMembers) && teamMembers.filter(tm => !members.includes(tm.name)).length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Quick add from team:</span>

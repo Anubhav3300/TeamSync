@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, ListTodo } from 'lucide-react';
 
-/**
- * CreateTaskModal Component
- * ----------------------------------------------------
- * High-end modal for adding individual deliverables with Lucide icons.
- */
 function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus = 'TO DO' }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -100,7 +95,6 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
 
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-            {/* Task Title */}
             <div className="form-group">
               <label className="form-label">Task Title *</label>
               <input
@@ -114,7 +108,6 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
               />
             </div>
 
-            {/* Project & Assignee */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Project *</label>
@@ -147,7 +140,6 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
               </div>
             </div>
 
-            {/* Status, Priority & Due Date */}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Status Stage</label>
@@ -187,7 +179,6 @@ function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus =
               </div>
             </div>
 
-            {/* Task Description */}
             <div className="form-group">
               <label className="form-label">Description & Acceptance Criteria</label>
               <textarea

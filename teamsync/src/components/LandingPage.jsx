@@ -24,25 +24,15 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-/**
- * LandingPage Component
- * ----------------------------------------------------
- * High-end enterprise SaaS landing page with Lucide React icons,
- * interactive feature previews, and modern design aesthetics.
- */
 function LandingPage({ onLogin, onOpenAuth }) {
-  // State for the interactive FAQ accordion
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
-  // State for interactive feature preview tab
   const [activePreviewTab, setActivePreviewTab] = useState('kanban');
 
-  // Toggle FAQ accordion item
   const toggleFaq = (index) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
 
-  // Smooth scroll helper
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -50,7 +40,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
     }
   };
 
-  // Key Features Data
   const features = [
     {
       id: 'f-1',
@@ -78,15 +67,14 @@ function LandingPage({ onLogin, onOpenAuth }) {
     },
     {
       id: 'f-4',
-      icon: Calendar,
+      icon: BarChart3,
       color: '#D97706',
       bg: '#FEF3C7',
-      title: 'Calendar & Sprint Deadlines',
-      description: 'Visual interactive monthly calendar with scheduled milestones, scheduled deliverables, and deadline tracking.'
+      title: 'Executive Reports & Analytics',
+      description: 'Comprehensive velocity metrics, customizable summary exports, and automated team performance insights.'
     }
   ];
 
-  // How It Works Steps
   const steps = [
     {
       stepNumber: '01',
@@ -108,7 +96,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
     }
   ];
 
-  // Tech Stack Data
   const techStack = [
     {
       tech: 'HTML5 Semantic Architecture',
@@ -136,7 +123,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
     }
   ];
 
-  // FAQ Data
   const faqs = [
     {
       question: 'What is TeamSync?',
@@ -158,7 +144,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
 
   return (
     <div className="landing-page">
-      {/* Ambient Visual Background Graphic */}
       <div className="landing-fixed-bg" aria-hidden="true">
         <img
           src="/team_growth_bg.jpg"
@@ -171,7 +156,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
         <div className="landing-grid-pattern" />
       </div>
 
-      {/* 1. SEMANTIC HEADER & NAVIGATION BAR */}
       <header className="landing-header">
         <div className="landing-container landing-header-content">
           <div className="landing-brand">
@@ -181,7 +165,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
             <span className="brand-logo-text">TeamSync</span>
           </div>
 
-          {/* Navigation Links */}
           <nav className="landing-nav">
             <button className="landing-nav-link" onClick={() => scrollToSection('features')}>
               Features
@@ -197,7 +180,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
             </button>
           </nav>
 
-          {/* Authentication Action Buttons */}
           <div className="landing-header-actions">
             <button
               className="btn-landing-secondary"
@@ -217,9 +199,7 @@ function LandingPage({ onLogin, onOpenAuth }) {
         </div>
       </header>
 
-      {/* 2. MAIN CONTENT */}
       <main>
-        {/* HERO SECTION */}
         <section className="landing-hero-section">
           <div className="landing-container">
             <div className="landing-hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
@@ -247,7 +227,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
               </button>
             </div>
 
-            {/* Metric Highlights Strip */}
             <div className="landing-metrics-strip" style={{
               display: 'flex',
               alignItems: 'center',
@@ -273,7 +252,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
               </div>
             </div>
 
-            {/* Interactive Live Preview Card */}
             <div className="landing-preview-card">
               <div className="preview-card-header">
                 <div className="preview-window-dots">
@@ -367,7 +345,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
           </div>
         </section>
 
-        {/* 3. CORE FEATURES SECTION */}
         <section id="features" className="landing-section">
           <div className="landing-container">
             <div className="section-header">
@@ -395,7 +372,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
           </div>
         </section>
 
-        {/* 4. HOW IT WORKS SECTION */}
         <section id="how-it-works" className="landing-section bg-subtle-section">
           <div className="landing-container">
             <div className="section-header">
@@ -426,7 +402,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
           </div>
         </section>
 
-        {/* 5. TECH STACK & ARCHITECTURE HIGHLIGHTS */}
         <section id="tech-stack" className="landing-section">
           <div className="landing-container">
             <div className="section-header">
@@ -454,7 +429,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
           </div>
         </section>
 
-        {/* 6. INTERACTIVE FAQ ACCORDION SECTION */}
         <section id="faq" className="landing-section bg-subtle-section">
           <div className="landing-container">
             <div className="section-header">
@@ -492,7 +466,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
           </div>
         </section>
 
-        {/* 7. CLEAN & SIMPLE CTA SECTION */}
         <section className="landing-cta-section">
           <div className="landing-container">
             <div className="landing-cta-card">
@@ -524,11 +497,9 @@ function LandingPage({ onLogin, onOpenAuth }) {
         </section>
       </main>
 
-      {/* 8. PROFESSIONAL ENTERPRISE FOOTER */}
       <footer className="landing-footer">
         <div className="landing-container">
           <div className="footer-main-grid">
-            {/* Column 1: Brand & Live Status */}
             <div className="footer-brand-col">
               <div className="footer-brand-header">
                 <div className="brand-icon-box">
@@ -547,7 +518,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
               </div>
             </div>
 
-            {/* Column 2: Platform Capabilities */}
             <div className="footer-links-col">
               <h4 className="footer-col-title">Platform</h4>
               <ul className="footer-links-list">
@@ -559,7 +529,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
               </ul>
             </div>
 
-            {/* Column 3: Tech Stack & Architecture */}
             <div className="footer-links-col">
               <h4 className="footer-col-title">Architecture</h4>
               <ul className="footer-links-list">
@@ -571,7 +540,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
               </ul>
             </div>
 
-            {/* Column 4: Workspace Access */}
             <div className="footer-links-col">
               <h4 className="footer-col-title">Workspace</h4>
               <ul className="footer-links-list">
@@ -587,7 +555,6 @@ function LandingPage({ onLogin, onOpenAuth }) {
             </div>
           </div>
 
-          {/* Footer Bottom Row */}
           <div className="footer-bottom-row">
             <div className="footer-copyright">
               © {new Date().getFullYear()} TeamSync Platform. All rights reserved.

@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus, Trash2, Plus, X, Send, Users, ShieldCheck, Mail } from 'lucide-react';
 
-/**
- * TeamView Component
- * ----------------------------------------------------
- * High-end enterprise team directory and capacity balancing with Lucide icons.
- */
 function TeamView({
   teamMembers = [],
   currentUser,
@@ -44,7 +39,6 @@ function TeamView({
 
   return (
     <div className="page-content">
-      {/* Header */}
       <div className="page-header">
         <div className="page-title-group">
           <h1>Team Directory ({teamMembers.length})</h1>
@@ -59,7 +53,6 @@ function TeamView({
         </div>
       </div>
 
-      {/* Team Grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
@@ -111,7 +104,6 @@ function TeamView({
                 </div>
               </div>
 
-              {/* Workload Capacity Bar */}
               <div style={{ background: 'var(--bg-subtle)', padding: '12px', borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.8rem' }}>
                   <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Bandwidth Utilization</span>
@@ -127,7 +119,6 @@ function TeamView({
                 </div>
               </div>
 
-              {/* Member Footer */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
                 {!isCurrentUser && onDeleteTeamMember ? (
                   <button
@@ -157,7 +148,6 @@ function TeamView({
           );
         })}
 
-        {/* Invite Member Quick Action Card */}
         <div
           className="card"
           onClick={() => setShowAddModal(true)}
@@ -182,7 +172,6 @@ function TeamView({
         </div>
       </div>
 
-      {/* Add Member Modal */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>

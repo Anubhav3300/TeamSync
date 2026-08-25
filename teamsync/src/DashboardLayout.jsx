@@ -5,7 +5,6 @@ import DashboardView from './components/DashboardView';
 import ProjectsView from './components/ProjectsView';
 import TasksView from './components/TasksView';
 import TeamView from './components/TeamView';
-import CalendarView from './components/CalendarView';
 import ReportsView from './components/ReportsView';
 import SettingsView from './components/SettingsView';
 
@@ -19,24 +18,11 @@ import {
   initialTeamMembers
 } from './data/mockData';
 
-/**
- * DashboardLayout Component
- * ----------------------------------------------------
- * Evaluation 1 Rubric Alignment:
- * 1. State Hub (useState): Manages core arrays (projects, tasks, teamMembers, notifications)
- * 2. Props Flow: Distributes state and action callbacks to view components
- * 3. Event Handling: Implements project creation/deletion, task status updates, filter search
- * 4. Semantic Layout: <aside> (Sidebar), <header> (TopNav), and <main> views
- */
 function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setTheme }) {
-  // Navigation active tab: 'dashboard' | 'projects' | 'tasks' | 'team' | 'calendar' | 'reports' | 'settings'
   const [activeTab, setActiveTab] = useState('dashboard');
   
-  // Unique storage key per user
   const userStoragePrefix = `teamsync_${currentUser?.id || 'default'}`;
 
-  // Application Data State (Arrays of Objects)
-  // Default to empty array [] so there are NO predefined projects!
   const [projects, setProjects] = useState(() => {
     try {
       const saved = localStorage.getItem(`${userStoragePrefix}_projects`);
@@ -53,21 +39,18 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     return [];
   });
 
-  // Persist projects to localStorage per user
   React.useEffect(() => {
     try {
       localStorage.setItem(`${userStoragePrefix}_projects`, JSON.stringify(projects));
     } catch (e) {}
   }, [projects, userStoragePrefix]);
 
-  // Persist tasks to localStorage per user
   React.useEffect(() => {
     try {
       localStorage.setItem(`${userStoragePrefix}_tasks`, JSON.stringify(tasks));
     } catch (e) {}
   }, [tasks, userStoragePrefix]);
 
-  // Team Members State: Initialize with ONLY currentUser by default (no predefined mock members)
   const [teamMembers, setTeamMembers] = useState(() => {
     try {
       const saved = localStorage.getItem(`${userStoragePrefix}_team`);
@@ -93,7 +76,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     return [];
   });
 
-  // Persist team members to localStorage per user
   React.useEffect(() => {
     try {
       localStorage.setItem(`${userStoragePrefix}_team`, JSON.stringify(teamMembers));
@@ -103,13 +85,11 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modals
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [createTaskDefaultStatus, setCreateTaskDefaultStatus] = useState('TO DO');
   const [selectedTaskDetails, setSelectedTaskDetails] = useState(null);
 
-  // Toast / Status message helper
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg) => {
@@ -117,7 +97,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Load demo sample data if user wants to populate mock projects and full team
   const handleLoadSampleData = () => {
     setProjects(initialProjects);
     setTasks(initialTasks);
@@ -128,7 +107,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     showToast('✨ Demo sample data and team loaded successfully!');
   };
 
-  // Clear all projects, tasks, and reset team to only current user
   const handleClearAllProjects = () => {
     setProjects([]);
     setTasks([]);
@@ -161,11 +139,9 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     showToast('🧹 Workspace & Team cleared. You now have a 100% clean slate!');
   };
 
-  // State manipulation handlers
   const handleAddProject = (newProject) => {
     setProjects([newProject, ...projects]);
 
-    // Extract all member names/identifiers from the new project
     const projectMemberNames = Array.isArray(newProject.members) ? [...newProject.members] : [];
     if (newProject.manager && !projectMemberNames.includes(newProject.manager)) {
       projectMemberNames.push(newProject.manager);
@@ -178,13 +154,11 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
       const cleanName = rawName.trim();
       if (!cleanName) return;
 
-      // Check if member already exists in current teamMembers directory by id or name
       const alreadyExists = teamMembers.some(
         tm => tm.id === cleanName || tm.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
       );
 
       if (!alreadyExists) {
-        // Also check if already staged in membersToAdd
         const alreadyStaged = membersToAdd.some(
           st => st.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
         );
@@ -195,7 +169,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           const emailPrefix = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '.').replace(/\.+/g, '.');
           const isManager = cleanName.toLowerCase() === (newProject.manager || '').toLowerCase();
 
-          // Infer appropriate department based on project category
           let dept = 'Engineering';
           if (newProject.category?.toLowerCase().includes('design')) dept = 'Design';
           else if (newProject.category?.toLowerCase().includes('marketing') || newProject.category?.toLowerCase().includes('growth')) dept = 'Marketing';
@@ -235,7 +208,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
 
   const handleAddTask = (newTask) => {
     setTasks([newTask, ...tasks]);
-    // update project task counter
     setProjects(projects.map(p => {
       if (p.id === newTask.projectId) {
         return { ...p, totalTasks: (p.totalTasks || 0) + 1 };
@@ -367,7 +339,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
 
   return (
     <div className="app-container">
-      {/* Toast Alert */}
       {toastMessage && (
         <div
           style={{
@@ -393,7 +364,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         </div>
       )}
 
-      {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -403,7 +373,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         pendingTasksCount={pendingTasksCount}
       />
 
-      {/* Main Content Area */}
       <div className="main-wrapper">
         <TopNav
           searchQuery={searchQuery}
@@ -413,7 +382,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           onLogout={onLogout}
         />
 
-        {/* View Routing */}
         {activeTab === 'dashboard' && (
           <DashboardView
             currentUser={currentUser}
@@ -429,7 +397,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
               setActiveTab('tasks');
             }}
             onNavigateToTeam={() => setActiveTab('team')}
-            onNavigateToCalendar={() => setActiveTab('calendar')}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}
@@ -486,13 +453,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           />
         )}
 
-        {activeTab === 'calendar' && (
-          <CalendarView
-            tasks={tasks}
-            onTaskClick={(task) => setSelectedTaskDetails(task)}
-          />
-        )}
-
         {activeTab === 'reports' && (
           <ReportsView
             projects={projects}
@@ -515,7 +475,6 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         )}
       </div>
 
-      {/* Modals */}
       <CreateProjectModal
         isOpen={isCreateProjectOpen}
         onClose={() => setIsCreateProjectOpen(false)}
