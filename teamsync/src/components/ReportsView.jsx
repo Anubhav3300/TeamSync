@@ -36,7 +36,7 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
             <span className="stat-badge positive">Target</span>
           </div>
           <div>
-            <div className="stat-label">Completion Velocity</div>
+            <div className="stat-label">Completion Rate</div>
             <div className="stat-value">{completionRate}%</div>
           </div>
         </div>
@@ -51,7 +51,7 @@ function ReportsView({ projects = [], tasks = [], teamMembers = [] }) {
             </span>
           </div>
           <div>
-            <div className="stat-label">Avg Sprint Velocity</div>
+            <div className="stat-label">Avg Sprint Points</div>
             <div className="stat-value">46.5 pts</div>
           </div>
         </div>
