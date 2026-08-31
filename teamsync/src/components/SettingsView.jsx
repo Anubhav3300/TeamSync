@@ -24,7 +24,7 @@ function SettingsView({
 }) {
   const [activeTab, setActiveTab] = useState('general');
   const [name, setName] = useState(currentUser?.name || 'Rohan Verma');
-  const [email, setEmail] = useState(currentUser?.email || 'rohan.v@teamsync.io');
+  const [email, setEmail] = useState(currentUser?.email || 'rohan.v@teamsync.in');
   const [autoNotify, setAutoNotify] = useState(true);
   const [autoReviewer, setAutoReviewer] = useState(true);
   const [slackIntegration, setSlackIntegration] = useState(true);
