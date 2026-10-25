@@ -1,20 +1,43 @@
 import React, { useState } from 'react';
-import { Search, Plus, Trash2, Filter, RotateCcw, CheckSquare, ListTodo, User, Calendar } from 'lucide-react';
+import { Search, Plus, Trash2, Filter, RotateCcw, CheckSquare, ListTodo, User, Calendar, Kanban, Table } from 'lucide-react';
+import KanbanView from './KanbanView';
 
 function TasksView({
   tasks,
   projects,
   teamMembers,
+  currentUser,
   onOpenCreateTask,
   onTaskClick,
   onToggleTaskComplete,
+  onUpdateTaskStatus,
   onDeleteTask,
-  searchQuery
+  searchQuery,
+  onSwitchToKanbanView
 }) {
+  const [viewMode, setViewMode] = useState('table');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
   const [projectFilter, setProjectFilter] = useState('ALL');
   const [localSearch, setLocalSearch] = useState('');
+
+  if (viewMode === 'kanban') {
+    return (
+      <KanbanView
+        tasks={tasks}
+        projects={projects}
+        teamMembers={teamMembers}
+        currentUser={currentUser}
+        onOpenCreateTask={onOpenCreateTask}
+        onTaskClick={onTaskClick}
+        onToggleTaskComplete={onToggleTaskComplete}
+        onUpdateTaskStatus={onUpdateTaskStatus}
+        onDeleteTask={onDeleteTask}
+        searchQuery={searchQuery}
+        onSwitchToTableView={() => setViewMode('table')}
+      />
+    );
+  }
 
   const query = searchQuery || localSearch;
 
@@ -41,7 +64,57 @@ function TasksView({
         </div>
 
         <div className="page-header-actions">
-          <div className="nav-search-container" style={{ width: '240px' }}>
+          <div style={{ display: 'inline-flex', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '3px', gap: '2px' }}>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 11px',
+                border: 'none',
+                borderRadius: '6px',
+                background: viewMode === 'table' ? 'var(--primary)' : 'transparent',
+                color: viewMode === 'table' ? '#FFFFFF' : 'var(--text-muted)',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              <Table size={14} />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (onSwitchToKanbanView) {
+                  onSwitchToKanbanView();
+                } else {
+                  setViewMode('kanban');
+                }
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 11px',
+                border: 'none',
+                borderRadius: '6px',
+                background: viewMode === 'kanban' ? 'var(--primary)' : 'transparent',
+                color: viewMode === 'kanban' ? '#FFFFFF' : 'var(--text-muted)',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+              title="Open Kanban Board"
+            >
+              <Kanban size={14} />
+              <span>Kanban Board</span>
+            </button>
+          </div>
+
+          <div className="nav-search-container" style={{ width: '220px' }}>
             <Search size={15} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
             <input
               type="text"

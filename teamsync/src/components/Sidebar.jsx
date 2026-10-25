@@ -7,7 +7,9 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Check
+  Check,
+  Kanban,
+  Bell
 } from 'lucide-react';
 
 function Sidebar({
@@ -16,12 +18,20 @@ function Sidebar({
   theme,
   setTheme,
   onLogout,
-  pendingTasksCount
+  pendingTasksCount,
+  unreadNotificationsCount
 }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'projects', label: 'My Projects', icon: FolderKanban },
+    { id: 'kanban', label: 'Kanban Board', icon: Kanban },
     { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: pendingTasksCount },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: Bell,
+      badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : null
+    },
     { id: 'team', label: 'Team', icon: Users },
     { id: 'reports', label: 'Reports', icon: BarChart3 }
   ];
@@ -57,7 +67,9 @@ function Sidebar({
               <Icon size={18} className="nav-icon" strokeWidth={isActive ? 2.3 : 1.8} />
               <span>{item.label}</span>
               {item.badge ? (
-                <span className="nav-badge">{item.badge}</span>
+                <span className={`nav-badge ${item.id === 'notifications' ? 'urgent' : ''}`}>
+                  {item.badge}
+                </span>
               ) : null}
             </button>
           );

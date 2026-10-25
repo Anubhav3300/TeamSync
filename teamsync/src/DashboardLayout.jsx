@@ -7,6 +7,8 @@ import TasksView from './components/TasksView';
 import TeamView from './components/TeamView';
 import ReportsView from './components/ReportsView';
 import SettingsView from './components/SettingsView';
+import KanbanView from './components/KanbanView';
+import NotificationsView from './components/NotificationsView';
 
 import CreateProjectModal from './components/modals/CreateProjectModal';
 import CreateTaskModal from './components/modals/CreateTaskModal';
@@ -15,7 +17,8 @@ import TaskDetailsModal from './components/modals/TaskDetailsModal';
 import {
   initialProjects,
   initialTasks,
-  initialTeamMembers
+  initialTeamMembers,
+  initialNotifications
 } from './data/mockData';
 
 function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setTheme }) {
@@ -82,12 +85,52 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     } catch (e) {}
   }, [teamMembers, userStoragePrefix]);
 
+  const [notifications, setNotifications] = useState(initialNotifications);
+
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
+
+  const handleMarkNotificationAsRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: !n.read } : n))
+    );
+  };
+
+  const handleMarkAllNotificationsAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const handleDeleteNotification = (id) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const handleClearAllNotifications = () => {
+    setNotifications([]);
+  };
+
+  const handleResetNotifications = () => {
+    setNotifications(initialNotifications);
+  };
+
+  const handleNotificationClick = (notif) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
+    );
+    if (notif.type === 'assignment') {
+      setActiveTab('tasks');
+    } else if (notif.type === 'calendar') {
+      setActiveTab('dashboard');
+    } else if (notif.type === 'milestone') {
+      setActiveTab('projects');
+    }
+  };
+
   const [selectedProject, setSelectedProject] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [createTaskDefaultStatus, setCreateTaskDefaultStatus] = useState('TO DO');
+  const [createTaskDefaultDueDate, setCreateTaskDefaultDueDate] = useState('');
   const [selectedTaskDetails, setSelectedTaskDetails] = useState(null);
 
   const [toastMessage, setToastMessage] = useState(null);
@@ -101,6 +144,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     setProjects(initialProjects);
     setTasks(initialTasks);
     setTeamMembers(initialTeamMembers);
+    setNotifications(initialNotifications);
     if (currentUser?.isNewAccount) {
       setCurrentUser({ ...currentUser, isNewAccount: false });
     }
@@ -110,6 +154,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
   const handleClearAllProjects = () => {
     setProjects([]);
     setTasks([]);
+    setNotifications([]);
     setSelectedProject(null);
     setSelectedTaskDetails(null);
 
@@ -371,6 +416,8 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         setTheme={setTheme}
         onLogout={onLogout}
         pendingTasksCount={pendingTasksCount}
+        unreadNotificationsCount={unreadNotificationsCount}
+        showToast={showToast}
       />
 
       <div className="main-wrapper">
@@ -396,13 +443,15 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
               }
               setActiveTab('tasks');
             }}
+            onNavigateToKanban={() => setActiveTab('kanban')}
             onNavigateToTeam={() => setActiveTab('team')}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}
             onOpenCreateProject={() => setIsCreateProjectOpen(true)}
-            onOpenCreateTask={(status) => {
+            onOpenCreateTask={(status, dueDate) => {
               setCreateTaskDefaultStatus(status || 'TO DO');
+              setCreateTaskDefaultDueDate(dueDate || '');
               setIsCreateTaskOpen(true);
             }}
             onClearAllProjects={handleClearAllProjects}
@@ -427,19 +476,43 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           />
         )}
 
+        {activeTab === 'kanban' && (
+          <KanbanView
+            tasks={tasks}
+            projects={projects}
+            teamMembers={teamMembers}
+            currentUser={currentUser}
+            onOpenCreateTask={(status, dueDate) => {
+              setCreateTaskDefaultStatus(status || 'TO DO');
+              setCreateTaskDefaultDueDate(dueDate || '');
+              setIsCreateTaskOpen(true);
+            }}
+            onTaskClick={(task) => setSelectedTaskDetails(task)}
+            onToggleTaskComplete={handleToggleTaskComplete}
+            onUpdateTaskStatus={handleUpdateTaskStatus}
+            onDeleteTask={handleDeleteTask}
+            searchQuery={searchQuery}
+            onSwitchToTableView={() => setActiveTab('tasks')}
+          />
+        )}
+
         {activeTab === 'tasks' && (
           <TasksView
             tasks={tasks}
             projects={projects}
             teamMembers={teamMembers}
-            onOpenCreateTask={(status) => {
+            currentUser={currentUser}
+            onOpenCreateTask={(status, dueDate) => {
               setCreateTaskDefaultStatus(status || 'TO DO');
+              setCreateTaskDefaultDueDate(dueDate || '');
               setIsCreateTaskOpen(true);
             }}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
+            onUpdateTaskStatus={handleUpdateTaskStatus}
             onDeleteTask={handleDeleteTask}
             searchQuery={searchQuery}
+            onSwitchToKanbanView={() => setActiveTab('kanban')}
           />
         )}
 
@@ -447,9 +520,32 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           <TeamView
             teamMembers={teamMembers}
             currentUser={currentUser}
+            tasks={tasks}
+            projects={projects}
             onAddTeamMember={handleAddTeamMember}
             onDeleteTeamMember={handleDeleteTeamMember}
-            onOpenCreateTask={() => setIsCreateTaskOpen(true)}
+            onOpenCreateTask={(status, dueDate) => {
+              setCreateTaskDefaultStatus(status || 'TO DO');
+              setCreateTaskDefaultDueDate(dueDate || '');
+              setIsCreateTaskOpen(true);
+            }}
+            onTaskClick={(task) => setSelectedTaskDetails(task)}
+            onToggleTaskComplete={handleToggleTaskComplete}
+            onUpdateTaskStatus={handleUpdateTaskStatus}
+            showToast={showToast}
+          />
+        )}
+
+        {activeTab === 'notifications' && (
+          <NotificationsView
+            notifications={notifications}
+            onMarkAsRead={handleMarkNotificationAsRead}
+            onMarkAllAsRead={handleMarkAllNotificationsAsRead}
+            onDeleteNotification={handleDeleteNotification}
+            onClearAllNotifications={handleClearAllNotifications}
+            onResetNotifications={handleResetNotifications}
+            onNotificationClick={handleNotificationClick}
+            showToast={showToast}
           />
         )}
 
@@ -484,11 +580,15 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
 
       <CreateTaskModal
         isOpen={isCreateTaskOpen}
-        onClose={() => setIsCreateTaskOpen(false)}
+        onClose={() => {
+          setIsCreateTaskOpen(false);
+          setCreateTaskDefaultDueDate('');
+        }}
         onAddTask={handleAddTask}
         projects={projects}
         teamMembers={teamMembers}
         defaultStatus={createTaskDefaultStatus}
+        defaultDueDate={createTaskDefaultDueDate}
       />
 
       <TaskDetailsModal

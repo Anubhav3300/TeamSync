@@ -18,8 +18,11 @@ import {
   ChevronUp,
   Folder,
   BarChart2,
-  CheckSquare
+  CheckSquare,
+  Kanban
 } from 'lucide-react';
+import DeadlineCalendar from './DeadlineCalendar';
+import DeadlineScheduleModal from './modals/DeadlineScheduleModal';
 
 function DashboardView({
   currentUser,
@@ -28,6 +31,7 @@ function DashboardView({
   teamMembers = [],
   onNavigateToProjects,
   onNavigateToTasks,
+  onNavigateToKanban,
   onNavigateToTeam,
   onTaskClick,
   onToggleTaskComplete,
@@ -40,6 +44,8 @@ function DashboardView({
 }) {
   const [taskViewFilter, setTaskViewFilter] = useState('my-tasks');
   const [showCompleted, setShowCompleted] = useState(false);
+  const [isDeadlineScheduleOpen, setIsDeadlineScheduleOpen] = useState(true);
+  const [isFullCalendarModalOpen, setIsFullCalendarModalOpen] = useState(false);
 
   const userName = currentUser?.name || 'User';
   const firstName = userName.split(' ')[0];
@@ -75,6 +81,10 @@ function DashboardView({
 
   const totalMyTasks = myPendingTasks.length + myCompletedTasks.length;
   const myCompletionRate = totalMyTasks > 0 ? Math.round((myCompletedTasks.length / totalMyTasks) * 100) : 100;
+
+  const totalUpcomingDeadlines =
+    tasks.filter((t) => t.dueDate && t.status !== 'DONE').length +
+    projects.filter((p) => p.dueDate && p.status !== 'Completed').length;
 
   if (isCleanWorkspace) {
     return (
@@ -509,15 +519,87 @@ function DashboardView({
               <button
                 className="btn-secondary"
                 style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+                onClick={() => onNavigateToKanban && onNavigateToKanban()}
+              >
+                <Kanban size={16} style={{ color: 'var(--primary)' }} />
+                <span>Open Kanban Board</span>
+              </button>
+              <button
+                className="btn-secondary"
+                style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}
                 onClick={onExportReport}
               >
                 <BarChart2 size={16} style={{ color: 'var(--primary)' }} />
                 <span>Generate Productivity Report</span>
               </button>
+
+              <button
+                id="view-deadline-schedule-btn"
+                className={`btn-secondary ${isDeadlineScheduleOpen ? 'active' : ''}`}
+                style={{
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  borderColor: isDeadlineScheduleOpen ? 'var(--primary)' : undefined,
+                  backgroundColor: isDeadlineScheduleOpen ? 'var(--primary-light)' : undefined,
+                  color: isDeadlineScheduleOpen ? 'var(--primary)' : undefined
+                }}
+                onClick={() => setIsDeadlineScheduleOpen(!isDeadlineScheduleOpen)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Calendar size={16} style={{ color: 'var(--primary)' }} />
+                  <span style={{ fontWeight: 600 }}>View Deadline Schedule</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '2px 7px',
+                      borderRadius: '10px',
+                      background: 'var(--primary)',
+                      color: '#FFFFFF'
+                    }}
+                  >
+                    {totalUpcomingDeadlines} Due
+                  </span>
+                  {isDeadlineScheduleOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </div>
+              </button>
+
+              {isDeadlineScheduleOpen && (
+                <div className="personal-progress-calendar-wrapper">
+                  <DeadlineCalendar
+                    tasks={tasks}
+                    projects={projects}
+                    currentUser={currentUser}
+                    onTaskClick={onTaskClick}
+                    onNavigateToTasks={onNavigateToTasks}
+                    onOpenCreateTask={onOpenCreateTask}
+                    onOpenFullModal={() => setIsFullCalendarModalOpen(true)}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <DeadlineScheduleModal
+        isOpen={isFullCalendarModalOpen}
+        onClose={() => setIsFullCalendarModalOpen(false)}
+        tasks={tasks}
+        projects={projects}
+        currentUser={currentUser}
+        onTaskClick={onTaskClick}
+        onNavigateToTasks={onNavigateToTasks}
+        onOpenCreateTask={onOpenCreateTask}
+        onToggleTaskComplete={onToggleTaskComplete}
+      />
     </div>
   );
 }

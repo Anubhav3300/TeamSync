@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { X, Plus, ListTodo } from 'lucide-react';
 
-function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus = 'TO DO' }) {
+function CreateTaskModal({ isOpen, onClose, onAddTask, projects, defaultStatus = 'TO DO', defaultDueDate = '' }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [projectId, setProjectId] = useState(projects[0]?.id || 'proj-1');
   const [status, setStatus] = useState(defaultStatus);
   const [priority, setPriority] = useState('HIGH');
   const [assigneeName, setAssigneeName] = useState('');
-  const [dueDate, setDueDate] = useState('2026-10-20');
+  const [dueDate, setDueDate] = useState(() => defaultDueDate || '2026-10-26');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      if (defaultStatus) setStatus(defaultStatus);
+      if (defaultDueDate) setDueDate(defaultDueDate);
+    }
+  }, [isOpen, defaultStatus, defaultDueDate]);
 
   const selectedProject = projects.find(p => p.id === projectId) || projects[0];
 

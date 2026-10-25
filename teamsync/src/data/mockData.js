@@ -352,33 +352,64 @@ export const initialNotifications = [
     id: 'notif-1',
     title: 'Task Assigned',
     message: 'Rohan Verma assigned you to "Implement OAuth2 & SSO Flow"',
-    time: '10m ago',
+    time: '12m ago',
     read: false,
-    type: 'assignment'
+    type: 'assignment',
+    project: 'Cloud Security'
   },
   {
     id: 'notif-2',
     title: 'Sprint Review Scheduled',
-    message: 'Product Launch Q3 Sprint Review is set for Tomorrow at 10:00 AM',
-    time: '1h ago',
+    message: 'Product Launch Q3 Sprint Review is scheduled for Tomorrow at 10:00 AM',
+    time: '45m ago',
     read: false,
-    type: 'calendar'
+    type: 'calendar',
+    project: 'SaaS Platform'
   },
   {
     id: 'notif-3',
-    title: 'Project Milestone Reached',
-    message: 'Mobile Banking App reached 95% completion rate!',
-    time: '3h ago',
-    read: true,
-    type: 'milestone'
+    title: 'Deadline Approaching',
+    message: '"Database Migration to PostgreSQL 16" is due in less than 24 hours',
+    time: '2h ago',
+    read: false,
+    type: 'calendar',
+    project: 'Backend Modernization'
   },
   {
     id: 'notif-4',
-    title: 'New Comment',
-    message: 'David Kim replied to your comment on Finalize API Documentation',
-    time: '5h ago',
+    title: 'Project Milestone Reached',
+    message: 'Mobile Banking App reached 95% completion rate!',
+    time: '4h ago',
     read: true,
-    type: 'comment'
+    type: 'milestone',
+    project: 'Fintech App'
+  },
+  {
+    id: 'notif-5',
+    title: 'New Discussion Comment',
+    message: 'David Kim commented on "Finalize High-Throughput API Specs"',
+    time: '6h ago',
+    read: true,
+    type: 'comment',
+    project: 'API Gateway'
+  },
+  {
+    id: 'notif-6',
+    title: 'Code Review Approved',
+    message: 'Sarah Chen approved pull request #142 "Autoscaling Node Pool"',
+    time: 'Yesterday',
+    read: true,
+    type: 'assignment',
+    project: 'DevOps Pipeline'
+  },
+  {
+    id: 'notif-7',
+    title: 'Milestone Completed',
+    message: 'Phase 1: Multi-tenant Security Architecture approved by CISO',
+    time: '2 days ago',
+    read: true,
+    type: 'milestone',
+    project: 'Security Audit'
   }
 ];
 
