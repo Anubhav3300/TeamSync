@@ -140,6 +140,12 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  const handleOpenCreateTask = (status = 'TO DO', dueDate = '') => {
+    setCreateTaskDefaultStatus(status || 'TO DO');
+    setCreateTaskDefaultDueDate(dueDate || '');
+    setIsCreateTaskOpen(true);
+  };
+
   const handleLoadSampleData = () => {
     setProjects(initialProjects);
     setTasks(initialTasks);
@@ -449,11 +455,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}
             onOpenCreateProject={() => setIsCreateProjectOpen(true)}
-            onOpenCreateTask={(status, dueDate) => {
-              setCreateTaskDefaultStatus(status || 'TO DO');
-              setCreateTaskDefaultDueDate(dueDate || '');
-              setIsCreateTaskOpen(true);
-            }}
+            onOpenCreateTask={handleOpenCreateTask}
             onClearAllProjects={handleClearAllProjects}
             onLoadSampleData={handleLoadSampleData}
             onExportReport={handleExportReport}
@@ -482,11 +484,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             projects={projects}
             teamMembers={teamMembers}
             currentUser={currentUser}
-            onOpenCreateTask={(status, dueDate) => {
-              setCreateTaskDefaultStatus(status || 'TO DO');
-              setCreateTaskDefaultDueDate(dueDate || '');
-              setIsCreateTaskOpen(true);
-            }}
+            onOpenCreateTask={handleOpenCreateTask}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}
@@ -502,11 +500,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             projects={projects}
             teamMembers={teamMembers}
             currentUser={currentUser}
-            onOpenCreateTask={(status, dueDate) => {
-              setCreateTaskDefaultStatus(status || 'TO DO');
-              setCreateTaskDefaultDueDate(dueDate || '');
-              setIsCreateTaskOpen(true);
-            }}
+            onOpenCreateTask={handleOpenCreateTask}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}
@@ -524,11 +518,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             projects={projects}
             onAddTeamMember={handleAddTeamMember}
             onDeleteTeamMember={handleDeleteTeamMember}
-            onOpenCreateTask={(status, dueDate) => {
-              setCreateTaskDefaultStatus(status || 'TO DO');
-              setCreateTaskDefaultDueDate(dueDate || '');
-              setIsCreateTaskOpen(true);
-            }}
+            onOpenCreateTask={handleOpenCreateTask}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}

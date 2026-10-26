@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Trash2, Folder, FolderPlus, MoreVertical, CheckSquare, Sparkles, User } from 'lucide-react';
+import { Search, Plus, Trash2, Folder, User, CheckSquare } from 'lucide-react';
 
 function ProjectsView({
   projects,

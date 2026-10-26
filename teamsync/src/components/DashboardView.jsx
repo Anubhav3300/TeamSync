@@ -9,16 +9,13 @@ import {
   Calendar,
   ListTodo,
   Plus,
-  Trash2,
-  FolderPlus,
-  UserPlus,
   Sparkles,
   ArrowRight,
-  ChevronDown,
-  ChevronUp,
   Folder,
   BarChart2,
   CheckSquare,
+  ChevronDown,
+  ChevronUp,
   Kanban
 } from 'lucide-react';
 import DeadlineCalendar from './DeadlineCalendar';

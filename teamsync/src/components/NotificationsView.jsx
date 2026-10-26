@@ -1,21 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Bell,
-  CheckCheck,
-  Trash2,
-  Search,
-  Filter,
-  CheckSquare,
-  Clock,
-  TrendingUp,
-  MessageSquare,
-  Sparkles,
-  Calendar,
-  ArrowRight,
-  RotateCcw,
-  CheckCircle2,
-  Inbox
-} from 'lucide-react';
+import { Bell, CheckCheck, Trash2, Search, CheckSquare, Clock, TrendingUp, MessageSquare, RotateCcw, CheckCircle2, Inbox } from 'lucide-react';
 
 function NotificationsView({
   notifications = [],

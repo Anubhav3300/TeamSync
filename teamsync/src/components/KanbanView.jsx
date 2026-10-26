@@ -1,63 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Search,
-  Plus,
-  Trash2,
-  Filter,
-  RotateCcw,
-  CheckSquare,
-  ListTodo,
-  User,
-  Calendar,
-  Folder,
-  ChevronRight,
-  MoreVertical,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  MoveRight,
-  LayoutGrid,
-  Table as TableIcon
-} from 'lucide-react';
+import { Search, Plus, RotateCcw, CheckSquare, User, Calendar, Folder, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const COLUMNS = [
-  {
-    id: 'TO DO',
-    title: 'To Do',
-    subtitle: 'Backlog & planned work',
-    color: '#6366F1',
-    lightBg: '#EEF2FF',
-    accentBorder: '#C7D2FE',
-    pillClass: 'status-planning'
-  },
-  {
-    id: 'IN PROGRESS',
-    title: 'In Progress',
-    subtitle: 'Actively being developed',
-    color: '#F59E0B',
-    lightBg: '#FFFBEB',
-    accentBorder: '#FDE68A',
-    pillClass: 'status-active'
-  },
-  {
-    id: 'REVIEW',
-    title: 'Under Review',
-    subtitle: 'Peer review & QA testing',
-    color: '#8B5CF6',
-    lightBg: '#F3E8FF',
-    accentBorder: '#DDD6FE',
-    pillClass: 'status-review'
-  },
-  {
-    id: 'DONE',
-    title: 'Completed',
-    subtitle: 'Verified & closed deliverables',
-    color: '#10B981',
-    lightBg: '#ECFDF5',
-    accentBorder: '#A7F3D0',
-    pillClass: 'status-completed'
-  }
+  { id: 'TO DO', title: 'To Do', subtitle: 'Backlog & planned work', color: '#6366F1' },
+  { id: 'IN PROGRESS', title: 'In Progress', subtitle: 'Actively being developed', color: '#F59E0B' },
+  { id: 'REVIEW', title: 'Under Review', subtitle: 'Peer review & QA testing', color: '#8B5CF6' },
+  { id: 'DONE', title: 'Completed', subtitle: 'Verified & closed deliverables', color: '#10B981' }
 ];
 
 function KanbanView({

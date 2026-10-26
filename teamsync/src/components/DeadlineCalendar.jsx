@@ -1,18 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  AlertCircle,
-  CheckCircle2,
-  Folder,
-  Maximize2,
-  Plus,
-  X,
-  Filter,
-  CheckSquare
-} from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle2, Folder, Maximize2, Plus, CheckSquare } from 'lucide-react';
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const MONTH_NAMES = [

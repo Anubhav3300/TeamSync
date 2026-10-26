@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Trash2, Filter, RotateCcw, CheckSquare, ListTodo, User, Calendar, Kanban, Table } from 'lucide-react';
-import KanbanView from './KanbanView';
+import { Search, Plus, Trash2, Filter, RotateCcw, ListTodo, User, Calendar, Kanban, Table } from 'lucide-react';
 
 function TasksView({
   tasks,
@@ -15,29 +14,10 @@ function TasksView({
   searchQuery,
   onSwitchToKanbanView
 }) {
-  const [viewMode, setViewMode] = useState('table');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
   const [projectFilter, setProjectFilter] = useState('ALL');
   const [localSearch, setLocalSearch] = useState('');
-
-  if (viewMode === 'kanban') {
-    return (
-      <KanbanView
-        tasks={tasks}
-        projects={projects}
-        teamMembers={teamMembers}
-        currentUser={currentUser}
-        onOpenCreateTask={onOpenCreateTask}
-        onTaskClick={onTaskClick}
-        onToggleTaskComplete={onToggleTaskComplete}
-        onUpdateTaskStatus={onUpdateTaskStatus}
-        onDeleteTask={onDeleteTask}
-        searchQuery={searchQuery}
-        onSwitchToTableView={() => setViewMode('table')}
-      />
-    );
-  }
 
   const query = searchQuery || localSearch;
 
@@ -67,7 +47,6 @@ function TasksView({
           <div style={{ display: 'inline-flex', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '3px', gap: '2px' }}>
             <button
               type="button"
-              onClick={() => setViewMode('table')}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -75,11 +54,11 @@ function TasksView({
                 padding: '6px 11px',
                 border: 'none',
                 borderRadius: '6px',
-                background: viewMode === 'table' ? 'var(--primary)' : 'transparent',
-                color: viewMode === 'table' ? '#FFFFFF' : 'var(--text-muted)',
+                background: 'var(--primary)',
+                color: '#FFFFFF',
                 fontSize: '0.8rem',
                 fontWeight: 600,
-                cursor: 'pointer'
+                cursor: 'default'
               }}
             >
               <Table size={14} />
@@ -87,13 +66,7 @@ function TasksView({
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (onSwitchToKanbanView) {
-                  onSwitchToKanbanView();
-                } else {
-                  setViewMode('kanban');
-                }
-              }}
+              onClick={onSwitchToKanbanView}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -101,8 +74,8 @@ function TasksView({
                 padding: '6px 11px',
                 border: 'none',
                 borderRadius: '6px',
-                background: viewMode === 'kanban' ? 'var(--primary)' : 'transparent',
-                color: viewMode === 'kanban' ? '#FFFFFF' : 'var(--text-muted)',
+                background: 'transparent',
+                color: 'var(--text-muted)',
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 cursor: 'pointer'

@@ -1,19 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  X,
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  AlertCircle,
-  CheckCircle2,
-  Folder,
-  Search,
-  Filter,
-  CheckSquare,
-  Plus,
-  ArrowRight
-} from 'lucide-react';
+import { X, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, Folder, Search, CheckSquare, Plus, ArrowRight } from 'lucide-react';
 import {
   formatDateKey,
   parseDateKey,
@@ -52,15 +38,26 @@ function DeadlineScheduleModal({
   const allDeadlines = useMemo(() => {
     const list = [];
 
+    const getDueDateKey = (d) => {
+      if (!d) return '';
+      if (typeof d === 'string') return d.slice(0, 10);
+      try {
+        return formatDateKey(new Date(d));
+      } catch (e) {
+        return '';
+      }
+    };
+
     tasks.forEach((t) => {
-      if (t.dueDate) {
+      const dateKey = getDueDateKey(t.dueDate);
+      if (dateKey) {
         list.push({
           id: t.id,
           type: 'task',
-          title: t.title,
-          description: t.description,
-          dueDate: t.dueDate.slice(0, 10),
-          priority: t.priority || 'MED',
+          title: t.title || 'Untitled Task',
+          description: t.description || '',
+          dueDate: dateKey,
+          priority: (t.priority || 'MED').toUpperCase(),
           status: t.status || 'TO DO',
           projectName: t.projectName || 'Project',
           projectId: t.projectId,
@@ -72,14 +69,15 @@ function DeadlineScheduleModal({
     });
 
     projects.forEach((p) => {
-      if (p.dueDate) {
+      const dateKey = getDueDateKey(p.dueDate);
+      if (dateKey) {
         list.push({
           id: p.id,
           type: 'project',
-          title: p.name,
-          description: p.description,
-          dueDate: p.dueDate.slice(0, 10),
-          priority: p.priority || 'High',
+          title: p.name || 'Untitled Project',
+          description: p.description || '',
+          dueDate: dateKey,
+          priority: (p.priority || 'HIGH').toUpperCase(),
           status: p.status || 'Active',
           projectName: p.category || 'Initiative',
           projectId: p.id,
@@ -289,17 +287,20 @@ function DeadlineScheduleModal({
                     </div>
 
                     <div className="deadline-modal-day-pills">
-                      {itemsOnDay.slice(0, 2).map((item) => (
-                        <div
-                          key={item.id}
-                          className={`deadline-modal-day-mini-pill ${
-                            item.type === 'project' ? 'proj' : item.priority.toLowerCase()
-                          }`}
-                          title={item.title}
-                        >
-                          {item.title}
-                        </div>
-                      ))}
+                      {itemsOnDay.slice(0, 2).map((item) => {
+                        const pillPriority = (item.priority || 'med').toLowerCase();
+                        return (
+                          <div
+                            key={item.id}
+                            className={`deadline-modal-day-mini-pill ${
+                              item.type === 'project' ? 'proj' : pillPriority
+                            }`}
+                            title={item.title}
+                          >
+                            {item.title}
+                          </div>
+                        );
+                      })}
                       {count > 2 && (
                         <span className="deadline-modal-more-count">
                           +{count - 2} more
@@ -484,7 +485,7 @@ function DeadlineScheduleModal({
                               {item.title}
                             </span>
                             <span
-                              className={`priority-tag priority-${item.priority.toLowerCase()}`}
+                              className={`priority-tag priority-${(item.priority || 'med').toLowerCase()}`}
                             >
                               {item.priority}
                             </span>
