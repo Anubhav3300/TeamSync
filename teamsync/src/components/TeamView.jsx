@@ -21,11 +21,9 @@ function TeamView({
   const [department, setDepartment] = useState('Engineering');
   const [initialCapacity, setInitialCapacity] = useState(15);
 
-  // Filters & Search for Team Members
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
 
-  // Expanded member deliverables accordions { [memberId]: boolean }
   const [expandedMembers, setExpandedMembers] = useState({});
 
   const toggleMemberAccordion = (memberId) => {
@@ -36,7 +34,6 @@ function TeamView({
   };
 
 
-  // Associate tasks with each team member to compute live bandwidth
   const membersWithMetrics = useMemo(() => {
     return teamMembers.map((member) => {
       const memberTasks = tasks.filter((t) => {
@@ -48,11 +45,9 @@ function TeamView({
         return matchId || matchName;
       });
 
-      // Active vs Completed
       const activeTasksList = memberTasks.filter((t) => t.status !== 'DONE');
       const completedTasksList = memberTasks.filter((t) => t.status === 'DONE');
 
-      // If tasks exist in workspace for this member, use real counts; otherwise fallback to member defaults
       const activeCount = memberTasks.length > 0 ? activeTasksList.length : member.activeTasks || 0;
       const completedCount = completedTasksList.length;
       const totalAssigned = activeCount + completedCount;
@@ -60,8 +55,7 @@ function TeamView({
       const effectiveCapacity = member.maxCapacity || 15;
       const bandwidthPercentage = Math.min(100, Math.round((activeCount / effectiveCapacity) * 100));
 
-      // Workload classification
-      let bandwidthStatus = 'optimal'; // 'heavy' | 'optimal' | 'available'
+      let bandwidthStatus = 'optimal';
       if (bandwidthPercentage >= 85) bandwidthStatus = 'heavy';
       else if (bandwidthPercentage < 40) bandwidthStatus = 'available';
 
@@ -80,7 +74,6 @@ function TeamView({
     });
   }, [teamMembers, tasks]);
 
-  // Overall Team Bandwidth Summary
   const teamSummary = useMemo(() => {
     let totalActive = 0;
     let totalCapacity = 0;
@@ -113,7 +106,6 @@ function TeamView({
     };
   }, [membersWithMetrics]);
 
-  // Filtered members list for directory cards
   const filteredMembers = useMemo(() => {
     return membersWithMetrics.filter((m) => {
       if (searchQuery.trim()) {
@@ -175,7 +167,6 @@ function TeamView({
 
   return (
     <div className="page-content team-page-content">
-      {/* 1. Page Header */}
       <div className="page-header team-page-header">
         <div className="page-title-group">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -202,7 +193,6 @@ function TeamView({
         </div>
       </div>
 
-      {/* 2. Filter and Search Bar for Team Directory */}
       <div className="team-controls-bar">
         <div className="team-search-wrap">
           <Search size={15} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
@@ -216,7 +206,6 @@ function TeamView({
         </div>
 
         <div className="team-filters-group">
-          {/* Department Filter */}
           <select
             className="form-select"
             style={{ width: '160px', height: '34px', fontSize: '0.8rem' }}
@@ -249,7 +238,6 @@ function TeamView({
         </div>
       </div>
 
-      {/* 3. Team Members Grid (Clean profile cards without bandwidth meter or deliverables progress) */}
       <div className="team-cards-grid">
         {filteredMembers.map((member) => {
           const isCurrentUser =
@@ -259,7 +247,6 @@ function TeamView({
 
           return (
             <div key={member.id} className="card team-member-card">
-              {/* Member Top Info */}
               <div className="team-member-top-row">
                 <div className="workload-avatar-wrap">
                   <img
@@ -290,7 +277,6 @@ function TeamView({
                 </div>
               </div>
 
-              {/* Assigned Tasks Accordion Toggle */}
               {member.activeTasksList.length > 0 ? (
                 <div className="member-deliverables-accordion-wrap">
                   <button
@@ -344,7 +330,6 @@ function TeamView({
                 </div>
               )}
 
-              {/* Card Footer Actions */}
               <div className="team-member-card-footer">
                 {!isCurrentUser && onDeleteTeamMember ? (
                   <button
@@ -381,7 +366,6 @@ function TeamView({
           );
         })}
 
-        {/* Invite Member Action Card */}
         <div
           className="card team-invite-card"
           onClick={() => setShowAddModal(true)}
@@ -394,9 +378,8 @@ function TeamView({
             Add developers, designers, or leads to scale your team deliverables
           </p>
         </div>
-      </div>      {/* 4. BANDWIDTH UTILIZATION SECTION (BASIC & COMPACT) */}
+      </div>
       <div className="team-bandwidth-graph-section card">
-        {/* Section Header */}
         <div className="bandwidth-graph-header">
           <div className="bandwidth-graph-title-group">
             <div className="bandwidth-graph-icon-box">
@@ -423,7 +406,6 @@ function TeamView({
           </div>
         </div>
 
-        {/* 3 KPI Summary Cards */}
         <div className="bandwidth-kpi-summary-row">
           <div className="bandwidth-kpi-card">
             <span className="b-kpi-title">Active Workload</span>
@@ -478,7 +460,6 @@ function TeamView({
           </div>
         </div>
 
-        {/* Basic Member Capacity List */}
         <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {membersWithMetrics.map((m) => (
             <div
@@ -536,7 +517,6 @@ function TeamView({
         </div>
       </div>
 
-      {/* Invite Member Modal */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
         <div className="modal-card" onClick={(e) => e.stopPropagation()}>

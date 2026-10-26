@@ -28,13 +28,12 @@ function DeadlineScheduleModal({
   const [selectedDateKey, setSelectedDateKey] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
-  const [statusFilter, setStatusFilter] = useState('PENDING'); // 'ALL' | 'PENDING' | 'DONE'
+  const [statusFilter, setStatusFilter] = useState('PENDING');
 
   const todayKey = useMemo(() => formatDateKey(new Date()), []);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // Combine tasks & projects into a unified deadlines list
   const allDeadlines = useMemo(() => {
     const list = [];
 
@@ -90,7 +89,6 @@ function DeadlineScheduleModal({
     return list;
   }, [tasks, projects]);
 
-  // Deadlines mapped by date string
   const deadlinesByDate = useMemo(() => {
     const map = {};
     allDeadlines.forEach((item) => {
@@ -100,7 +98,6 @@ function DeadlineScheduleModal({
     return map;
   }, [allDeadlines]);
 
-  // Calendar days generation
   const calendarDays = useMemo(() => {
     const firstDayIndex = new Date(year, month, 1).getDay();
     const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
@@ -143,24 +140,19 @@ function DeadlineScheduleModal({
     return days;
   }, [year, month]);
 
-  // Filtered list for the agenda column
   const filteredAgendaList = useMemo(() => {
     return allDeadlines.filter((item) => {
-      // Date filter
       if (selectedDateKey && item.dueDate !== selectedDateKey) {
         return false;
       }
 
-      // Priority filter
       if (priorityFilter !== 'ALL') {
         if (item.priority.toUpperCase() !== priorityFilter) return false;
       }
 
-      // Status filter
       if (statusFilter === 'PENDING' && item.status === 'DONE') return false;
       if (statusFilter === 'DONE' && item.status !== 'DONE') return false;
 
-      // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchTitle = item.title.toLowerCase().includes(q);
@@ -185,7 +177,6 @@ function DeadlineScheduleModal({
         className="modal-card deadline-schedule-modal"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className="deadline-modal-header-icon">
@@ -210,9 +201,7 @@ function DeadlineScheduleModal({
           </button>
         </div>
 
-        {/* Modal Body: Split Calendar + Agenda */}
         <div className="deadline-modal-body">
-          {/* Left Column: Full Month Calendar */}
           <div className="deadline-modal-calendar-pane">
             <div className="deadline-modal-cal-nav">
               <h3 className="deadline-modal-cal-month">
@@ -328,9 +317,7 @@ function DeadlineScheduleModal({
             </div>
           </div>
 
-          {/* Right Column: Deadlines Agenda & Filtering */}
           <div className="deadline-modal-agenda-pane">
-            {/* Filter and Search Bar */}
             <div className="deadline-modal-search-box">
               <Search size={15} style={{ color: 'var(--text-muted)' }} />
               <input
@@ -385,7 +372,6 @@ function DeadlineScheduleModal({
               </div>
             </div>
 
-            {/* Selected Date Indicator Banner */}
             {selectedDateKey && (
               <div className="deadline-selected-date-banner">
                 <span>
@@ -408,7 +394,6 @@ function DeadlineScheduleModal({
               </div>
             )}
 
-            {/* Agenda Items List */}
             <div className="deadline-modal-agenda-items">
               {filteredAgendaList.length === 0 ? (
                 <div className="deadline-modal-empty-state">
@@ -536,7 +521,6 @@ function DeadlineScheduleModal({
           </div>
         </div>
 
-        {/* Modal Footer */}
         <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             Showing {filteredAgendaList.length} scheduled deliverable(s)

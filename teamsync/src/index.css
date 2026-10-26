@@ -3173,9 +3173,6 @@ a {
   }
 }
 
-/* ==========================================================================
-   DEADLINE CALENDAR & SCHEDULE STYLES
-   ========================================================================== */
 
 .personal-progress-calendar-wrapper {
   margin-top: 10px;
@@ -3438,7 +3435,6 @@ a {
   color: var(--text-muted);
 }
 
-/* Agenda list */
 .deadline-schedule-agenda {
   display: flex;
   flex-direction: column;
@@ -3607,9 +3603,6 @@ a {
   gap: 4px;
 }
 
-/* ==========================================================================
-   DEADLINE SCHEDULE MODAL (FULL VIEW)
-   ========================================================================== */
 
 .deadline-schedule-modal {
   max-width: 940px !important;
@@ -3784,7 +3777,6 @@ a {
   gap: 6px;
 }
 
-/* Agenda pane in modal */
 .deadline-modal-agenda-pane {
   display: flex;
   flex-direction: column;
@@ -4057,9 +4049,6 @@ a {
   }
 }
 
-/* ==========================================================================
-   KANBAN BOARD STYLES
-   ========================================================================== */
 
 .kanban-page-content {
   display: flex;
@@ -4187,7 +4176,6 @@ a {
   border-color: var(--primary);
 }
 
-/* Kanban Board Columns Grid */
 .kanban-board-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4309,7 +4297,6 @@ a {
   background: rgba(0, 0, 0, 0.15);
 }
 
-/* Kanban Task Card */
 .kanban-task-card {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -4475,9 +4462,6 @@ a {
   color: var(--primary);
 }
 
-/* ==========================================================================
-   TEAM DIRECTORY & GRAPH-BASED BANDWIDTH UTILIZATION
-   ========================================================================== */
 
 .team-page-content {
   display: flex;
@@ -4499,7 +4483,6 @@ a {
   border: 1px solid var(--primary-border);
 }
 
-/* Filter and Search Bar */
 .team-controls-bar {
   display: flex;
   align-items: center;
@@ -4542,7 +4525,6 @@ a {
   flex-wrap: wrap;
 }
 
-/* Team Member Cards Grid (Clean Directory Cards) */
 .team-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -4636,7 +4618,6 @@ a {
   padding: 4px 0;
 }
 
-/* Deliverables Accordion */
 .member-deliverables-accordion-wrap {
   display: flex;
   flex-direction: column;
@@ -4726,7 +4707,6 @@ a {
   white-space: nowrap;
 }
 
-/* Card Footer */
 .team-member-card-footer {
   display: flex;
   align-items: center;
@@ -4761,7 +4741,6 @@ a {
   color: var(--primary);
 }
 
-/* Invite Member Action Card */
 .team-invite-card {
   border: 2px dashed var(--border);
   border-radius: 16px;
@@ -4810,9 +4789,6 @@ a {
   line-height: 1.4;
 }
 
-/* ==========================================================================
-   BANDWIDTH UTILIZATION GRAPH SECTION (DISPLAYED AFTER TEAM MEMBERS)
-   ========================================================================== */
 
 .team-bandwidth-graph-section {
   background: var(--bg-card);
@@ -4906,7 +4882,6 @@ a {
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
-/* Graph Switcher Pills */
 .bandwidth-graph-controls {
   display: flex;
   align-items: center;
@@ -4948,7 +4923,6 @@ a {
   font-weight: 700;
 }
 
-/* KPI Summary Cards */
 .bandwidth-kpi-summary-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -5037,7 +5011,6 @@ a {
   transition: width 0.3s ease;
 }
 
-/* Main Chart Wrapper */
 .bandwidth-chart-wrapper {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -5103,7 +5076,6 @@ a {
   width: 170px !important;
 }
 
-/* SVG Chart */
 .svg-chart-container {
   width: 100%;
   overflow-x: auto;
@@ -5124,7 +5096,6 @@ a {
   filter: brightness(1.1);
 }
 
-/* Member Inspector & Quick Tuner Card */
 .chart-member-inspector-card {
   background: var(--bg-subtle);
   border: 1px solid var(--border);
@@ -5212,7 +5183,6 @@ a {
 }
 
 
-/* Sprint Trend Explanatory Guide Card */
 .sprint-guide-card {
   display: flex;
   align-items: center;
@@ -5244,9 +5214,6 @@ a {
   color: var(--text-heading);
 }
 
-/* ==========================================================================
-   NOTIFICATIONS VIEW STYLES
-   ========================================================================== */
 
 .notifications-page-content {
   display: flex;
@@ -5280,7 +5247,6 @@ a {
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
-/* Controls Bar */
 .notifications-controls-bar {
   display: flex;
   align-items: center;
@@ -5357,7 +5323,6 @@ a {
   width: 100%;
 }
 
-/* Notifications Container */
 .notifications-container {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -5517,7 +5482,6 @@ a {
   background: rgba(239, 68, 68, 0.1);
 }
 
-/* Empty State */
 .notifications-empty-state {
   display: flex;
   flex-direction: column;

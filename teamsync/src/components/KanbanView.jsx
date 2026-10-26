@@ -28,16 +28,13 @@ function KanbanView({
   const [selectedAssignee, setSelectedAssignee] = useState('ALL');
   const [onlyMyTasks, setOnlyMyTasks] = useState(false);
 
-  // Drag and drop state
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [dragOverColId, setDragOverColId] = useState(null);
 
   const query = (searchQuery || localSearch).toLowerCase().trim();
 
-  // Filter tasks based on search & filter controls
   const filteredTasks = useMemo(() => {
     return tasks.filter((t) => {
-      // Search query
       if (query) {
         const matchesTitle = t.title?.toLowerCase().includes(query);
         const matchesDesc = t.description?.toLowerCase().includes(query);
@@ -48,22 +45,18 @@ function KanbanView({
         }
       }
 
-      // Project filter
       if (selectedProject !== 'ALL' && t.projectId !== selectedProject) {
         return false;
       }
 
-      // Priority filter
       if (selectedPriority !== 'ALL' && t.priority !== selectedPriority) {
         return false;
       }
 
-      // Assignee filter
       if (selectedAssignee !== 'ALL' && t.assigneeId !== selectedAssignee && t.assigneeName !== selectedAssignee) {
         return false;
       }
 
-      // Only my tasks filter
       if (onlyMyTasks && currentUser) {
         const matchId = t.assigneeId === currentUser.id;
         const matchName =
@@ -77,7 +70,6 @@ function KanbanView({
     });
   }, [tasks, query, selectedProject, selectedPriority, selectedAssignee, onlyMyTasks, currentUser]);
 
-  // Tasks grouped by column status
   const tasksByColumn = useMemo(() => {
     const groups = {
       'TO DO': [],
@@ -94,7 +86,6 @@ function KanbanView({
     return groups;
   }, [filteredTasks]);
 
-  // Drag event handlers
   const handleDragStart = (e, taskId) => {
     setDraggedTaskId(taskId);
     e.dataTransfer.setData('text/plain', taskId);
@@ -145,7 +136,6 @@ function KanbanView({
     }
   };
 
-  // Quick move handler from card dropdown
   const handleQuickMove = (taskId, newStatus) => {
     if (onUpdateTaskStatus) {
       onUpdateTaskStatus(taskId, newStatus);
@@ -161,7 +151,6 @@ function KanbanView({
     }
   };
 
-  // Summary stats
   const totalTasksCount = tasks.length;
   const completedTasksCount = tasks.filter((t) => t.status === 'DONE').length;
   const inProgressCount = tasks.filter((t) => t.status === 'IN PROGRESS').length;
@@ -170,7 +159,6 @@ function KanbanView({
 
   return (
     <div className="page-content kanban-page-content">
-      {/* Page Header */}
       <div className="page-header kanban-page-header">
         <div className="page-title-group">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -242,7 +230,6 @@ function KanbanView({
         </div>
       </div>
 
-      {/* Stats Summary Bar */}
       <div className="kanban-stats-bar">
         <div className="kanban-stat-item">
           <span className="kanban-stat-number">{tasksByColumn['TO DO']?.length || 0}</span>
@@ -287,7 +274,6 @@ function KanbanView({
         </div>
       </div>
 
-      {/* Filter and Search Controls Bar */}
       <div className="kanban-controls-bar">
         <div className="kanban-search-wrap">
           <Search size={15} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
@@ -301,7 +287,6 @@ function KanbanView({
         </div>
 
         <div className="kanban-filters-group">
-          {/* Project Filter */}
           <select
             className="form-select kanban-select"
             value={selectedProject}
@@ -315,7 +300,6 @@ function KanbanView({
             ))}
           </select>
 
-          {/* Priority Filter */}
           <select
             className="form-select kanban-select"
             value={selectedPriority}
@@ -327,7 +311,6 @@ function KanbanView({
             <option value="LOW">Low Priority</option>
           </select>
 
-          {/* Assignee Filter */}
           <select
             className="form-select kanban-select"
             value={selectedAssignee}
@@ -341,7 +324,6 @@ function KanbanView({
             ))}
           </select>
 
-          {/* My Tasks Toggle */}
           <button
             type="button"
             className={`btn-secondary btn-sm kanban-my-tasks-btn ${onlyMyTasks ? 'active' : ''}`}
@@ -351,7 +333,6 @@ function KanbanView({
             <span>My Tasks</span>
           </button>
 
-          {/* Reset Filters */}
           {(localSearch || selectedProject !== 'ALL' || selectedPriority !== 'ALL' || selectedAssignee !== 'ALL' || onlyMyTasks) && (
             <button
               type="button"
@@ -373,7 +354,6 @@ function KanbanView({
         </div>
       </div>
 
-      {/* 4-Column Kanban Board Grid */}
       <div className="kanban-board-grid">
         {COLUMNS.map((col) => {
           const colTasks = tasksByColumn[col.id] || [];
@@ -387,7 +367,6 @@ function KanbanView({
               onDragLeave={(e) => handleDragLeave(e, col.id)}
               onDrop={(e) => handleDrop(e, col.id)}
             >
-              {/* Column Header */}
               <div className="kanban-column-header">
                 <div className="kanban-col-title-wrap">
                   <span
@@ -409,10 +388,8 @@ function KanbanView({
                 </button>
               </div>
 
-              {/* Subtitle / WIP limit indication */}
               <div className="kanban-col-subtitle">{col.subtitle}</div>
 
-              {/* Column Tasks Container */}
               <div className="kanban-cards-list">
                 {colTasks.length === 0 ? (
                   <div className="kanban-col-empty">
@@ -437,7 +414,6 @@ function KanbanView({
                         } ${isDone ? 'is-done' : ''}`}
                         onClick={() => onTaskClick && onTaskClick(task)}
                       >
-                        {/* Top Meta: Project & Priority */}
                         <div className="kanban-card-top">
                           <span
                             className="kanban-card-proj-pill"
@@ -454,7 +430,6 @@ function KanbanView({
                           </span>
                         </div>
 
-                        {/* Task Title */}
                         <h4
                           className={`kanban-card-title ${
                             isDone ? 'strikethrough' : ''
@@ -463,12 +438,10 @@ function KanbanView({
                           {task.title}
                         </h4>
 
-                        {/* Task Description Snippet */}
                         {task.description && (
                           <p className="kanban-card-desc">{task.description}</p>
                         )}
 
-                        {/* Subtasks Progress if any */}
                         {totalSubtasks > 0 && (
                           <div className="kanban-card-subtasks-wrap">
                             <div className="kanban-card-subtasks-meta">
@@ -497,9 +470,7 @@ function KanbanView({
                           </div>
                         )}
 
-                        {/* Bottom Row: Assignee, Due Date & Quick Column Move */}
                         <div className="kanban-card-footer">
-                          {/* Assignee */}
                           <div
                             className="kanban-card-assignee"
                             title={`Assigned to: ${task.assigneeName || 'Unassigned'}`}
@@ -514,7 +485,6 @@ function KanbanView({
                             </span>
                           </div>
 
-                          {/* Due Date */}
                           {task.dueDate && (
                             <div
                               className="kanban-card-due"
@@ -530,7 +500,6 @@ function KanbanView({
                             </div>
                           )}
 
-                          {/* Quick Status Move Dropdown (accessible touch/click action) */}
                           <div
                             className="kanban-card-status-select-wrap"
                             onClick={(e) => e.stopPropagation()}

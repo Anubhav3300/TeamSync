@@ -53,11 +53,10 @@ function DeadlineCalendar({
 }) {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDateKey, setSelectedDateKey] = useState(null);
-  const [filterScope, setFilterScope] = useState('all'); // 'all' | 'mine'
+  const [filterScope, setFilterScope] = useState('all');
 
   const todayKey = useMemo(() => formatDateKey(new Date()), []);
 
-  // Filter tasks based on scope (mine vs all)
   const scopedTasks = useMemo(() => {
     if (filterScope === 'all' || !currentUser) return tasks;
     return tasks.filter((t) => {
@@ -70,7 +69,6 @@ function DeadlineCalendar({
     });
   }, [tasks, filterScope, currentUser]);
 
-  // Filter projects based on scope
   const scopedProjects = useMemo(() => {
     if (filterScope === 'all' || !currentUser) return projects;
     return projects.filter((p) => {
@@ -80,7 +78,6 @@ function DeadlineCalendar({
     });
   }, [projects, filterScope, currentUser]);
 
-  // Map dates to their items { [dateKey]: { tasks: [], projects: [] } }
   const deadlinesByDate = useMemo(() => {
     const map = {};
 
@@ -101,18 +98,16 @@ function DeadlineCalendar({
     return map;
   }, [scopedTasks, scopedProjects]);
 
-  // Calendar generation for current month
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
   const calendarDays = useMemo(() => {
-    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 (Sun) - 6 (Sat)
+    const firstDayIndex = new Date(year, month, 1).getDay();
     const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
 
     const days = [];
 
-    // Trailing days from previous month
     for (let i = firstDayIndex - 1; i >= 0; i--) {
       const d = daysInPrevMonth - i;
       const dateObj = new Date(year, month - 1, d);
@@ -126,7 +121,6 @@ function DeadlineCalendar({
       });
     }
 
-    // Days in current month
     for (let d = 1; d <= daysInCurrentMonth; d++) {
       const dateObj = new Date(year, month, d);
       const key = formatDateKey(dateObj);
@@ -138,7 +132,6 @@ function DeadlineCalendar({
       });
     }
 
-    // Leading days of next month to complete 5 or 6 rows (multiples of 7)
     const remainingDays = (7 - (days.length % 7)) % 7;
     for (let d = 1; d <= remainingDays; d++) {
       const dateObj = new Date(year, month + 1, d);
@@ -169,7 +162,6 @@ function DeadlineCalendar({
     setSelectedDateKey(formatDateKey(now));
   };
 
-  // Items for selected date
   const selectedDateItems = useMemo(() => {
     if (!selectedDateKey || !deadlinesByDate[selectedDateKey]) {
       return { tasks: [], projects: [] };
@@ -177,7 +169,6 @@ function DeadlineCalendar({
     return deadlinesByDate[selectedDateKey];
   }, [selectedDateKey, deadlinesByDate]);
 
-  // Upcoming deadlines (next 4) when no date is selected or if user toggles
   const upcomingDeadlines = useMemo(() => {
     const all = [];
 
@@ -211,7 +202,6 @@ function DeadlineCalendar({
       }
     });
 
-    // Sort by due date
     all.sort((a, b) => {
       const da = parseDateKey(a.dueDate);
       const db = parseDateKey(b.dueDate);
@@ -221,7 +211,6 @@ function DeadlineCalendar({
     return all.slice(0, 4);
   }, [scopedTasks, scopedProjects]);
 
-  // Total deadlines count in current view
   const totalDeadlinesCount = useMemo(() => {
     let count = 0;
     Object.keys(deadlinesByDate).forEach((k) => {
@@ -232,7 +221,6 @@ function DeadlineCalendar({
 
   return (
     <div className="deadline-calendar-widget">
-      {/* Calendar Header with Controls */}
       <div className="deadline-cal-header">
         <div className="deadline-cal-title-box">
           <span className="deadline-cal-month-name">
@@ -284,7 +272,6 @@ function DeadlineCalendar({
         </div>
       </div>
 
-      {/* Scope Filter Buttons */}
       <div className="deadline-cal-scope-row">
         <div className="deadline-cal-scope-toggle">
           <button
@@ -314,7 +301,6 @@ function DeadlineCalendar({
         )}
       </div>
 
-      {/* Weekdays Row */}
       <div className="deadline-cal-weekdays">
         {WEEKDAYS.map((wd) => (
           <div key={wd} className="deadline-cal-weekday-cell">
@@ -323,7 +309,6 @@ function DeadlineCalendar({
         ))}
       </div>
 
-      {/* Calendar Days Grid */}
       <div className="deadline-cal-grid">
         {calendarDays.map((day) => {
           const isToday = day.dateKey === todayKey;
@@ -335,7 +320,6 @@ function DeadlineCalendar({
 
           const totalCount = (items?.tasks?.length || 0) + (items?.projects?.length || 0);
 
-          // Determine dot color indicators
           const hasHigh = items?.tasks.some((t) => t.priority === 'HIGH');
           const hasMed = items?.tasks.some((t) => t.priority === 'MED');
           const hasLow = items?.tasks.some((t) => t.priority === 'LOW');
@@ -380,7 +364,6 @@ function DeadlineCalendar({
         })}
       </div>
 
-      {/* Calendar Legend */}
       <div className="deadline-cal-legend">
         <span className="cal-legend-item">
           <span className="cal-dot dot-high" /> High
@@ -396,7 +379,6 @@ function DeadlineCalendar({
         </span>
       </div>
 
-      {/* Deadline Items List (Selected Date or Upcoming) */}
       <div className="deadline-schedule-agenda">
         <div className="deadline-agenda-header">
           <div className="deadline-agenda-title">
@@ -427,7 +409,6 @@ function DeadlineCalendar({
 
         <div className="deadline-agenda-list">
           {selectedDateKey ? (
-            // Show items on selected date
             selectedDateItems.tasks.length === 0 &&
             selectedDateItems.projects.length === 0 ? (
               <div className="deadline-agenda-empty">
@@ -506,7 +487,6 @@ function DeadlineCalendar({
               </>
             )
           ) : (
-            // Show upcoming deadlines list
             upcomingDeadlines.length === 0 ? (
               <div className="deadline-agenda-empty">
                 <span>No upcoming deadlines scheduled</span>

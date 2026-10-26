@@ -11,7 +11,7 @@ function NotificationsView({
   onNotificationClick,
   showToast
 }) {
-  const [activeFilter, setActiveFilter] = useState('ALL'); // 'ALL' | 'UNREAD' | 'ASSIGNMENT' | 'CALENDAR' | 'MILESTONE'
+  const [activeFilter, setActiveFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const unreadCount = useMemo(() => {
@@ -20,7 +20,6 @@ function NotificationsView({
 
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notif) => {
-      // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchTitle = notif.title?.toLowerCase().includes(q);
@@ -28,7 +27,6 @@ function NotificationsView({
         if (!matchTitle && !matchMsg) return false;
       }
 
-      // Filter
       if (activeFilter === 'UNREAD') {
         return !notif.read;
       }
@@ -63,7 +61,6 @@ function NotificationsView({
 
   return (
     <div className="page-content notifications-page-content">
-      {/* Header */}
       <div className="page-header notifications-page-header">
         <div className="page-title-group">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -133,7 +130,6 @@ function NotificationsView({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
       <div className="notifications-controls-bar">
         <div className="notifications-filter-pills">
           <button
@@ -185,7 +181,6 @@ function NotificationsView({
         </div>
       </div>
 
-      {/* Notifications List */}
       <div className="notifications-container card">
         {filteredNotifications.length > 0 ? (
           <div className="notifications-list">
@@ -202,12 +197,10 @@ function NotificationsView({
                     }
                   }}
                 >
-                  {/* Category Icon */}
                   <div className="notification-icon-wrap">
                     {getNotificationIcon(notif.type)}
                   </div>
 
-                  {/* Notification Content */}
                   <div className="notification-body">
                     <div className="notification-header-row">
                       <div className="notification-title-wrap">
@@ -223,7 +216,6 @@ function NotificationsView({
                     <p className="notification-message">{notif.message}</p>
                   </div>
 
-                  {/* Actions on Item */}
                   <div className="notification-actions-wrap" onClick={(e) => e.stopPropagation()}>
                     <button
                       type="button"
