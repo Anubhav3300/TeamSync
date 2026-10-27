@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Check,
   ArrowRight,
@@ -25,7 +27,26 @@ import {
 } from 'lucide-react';
 
 function LandingPage({ onLogin, onOpenAuth }) {
+  const navigate = useNavigate();
+  const { loginDemo } = useAuth();
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
+
+  const handleOpenAuth = (mode = 'login') => {
+    if (onOpenAuth) {
+      onOpenAuth(mode);
+    } else {
+      navigate(`/auth?mode=${mode}`);
+    }
+  };
+
+  const handleDemoAccess = () => {
+    if (onLogin) {
+      onLogin();
+    } else {
+      loginDemo('rohan');
+      navigate('/dashboard');
+    }
+  };
 
   const [activePreviewTab, setActivePreviewTab] = useState('kanban');
 
@@ -183,13 +204,13 @@ function LandingPage({ onLogin, onOpenAuth }) {
           <div className="landing-header-actions">
             <button
               className="btn-landing-secondary"
-              onClick={() => onOpenAuth('login')}
+              onClick={() => handleOpenAuth('login')}
             >
               Sign In
             </button>
             <button
               className="btn-landing-primary"
-              onClick={() => onOpenAuth('register')}
+              onClick={() => handleOpenAuth('register')}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <span>Get Started</span>
@@ -217,11 +238,11 @@ function LandingPage({ onLogin, onOpenAuth }) {
             </p>
 
             <div className="landing-hero-cta-group">
-              <button className="btn-hero-primary" onClick={onLogin} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <button className="btn-hero-primary" onClick={handleDemoAccess} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                 <Rocket size={16} />
                 <span>Open Demo Workspace</span>
               </button>
-              <button className="btn-hero-secondary" onClick={() => onOpenAuth('register')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <button className="btn-hero-secondary" onClick={() => handleOpenAuth('register')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                 <span>Create Free Account</span>
                 <ArrowRight size={15} />
               </button>
@@ -478,17 +499,17 @@ function LandingPage({ onLogin, onOpenAuth }) {
               </p>
 
               <div className="cta-actions-group">
-                <button className="btn-hero-primary" onClick={onLogin} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <button className="btn-hero-primary" onClick={handleDemoAccess} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                   <Rocket size={16} />
                   <span>Open Demo Workspace</span>
                 </button>
 
-                <button className="btn-hero-secondary" onClick={() => onOpenAuth('register')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <button className="btn-hero-secondary" onClick={() => handleOpenAuth('register')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                   <span>Sign Up Free</span>
                   <ArrowRight size={15} />
                 </button>
 
-                <button className="btn-landing-secondary" onClick={() => onOpenAuth('login')} style={{ padding: '14px 20px', borderRadius: '10px' }}>
+                <button className="btn-landing-secondary" onClick={() => handleOpenAuth('login')} style={{ padding: '14px 20px', borderRadius: '10px' }}>
                   Sign In
                 </button>
               </div>
@@ -544,12 +565,12 @@ function LandingPage({ onLogin, onOpenAuth }) {
               <h4 className="footer-col-title">Workspace</h4>
               <ul className="footer-links-list">
                 <li>
-                  <button onClick={onLogin} className="footer-highlight-link">
+                  <button onClick={handleDemoAccess} className="footer-highlight-link">
                     ⚡ Demo Workspace
                   </button>
                 </li>
-                <li><button onClick={() => onOpenAuth('login')}>Sign In</button></li>
-                <li><button onClick={() => onOpenAuth('register')}>Create Free Account</button></li>
+                <li><button onClick={() => handleOpenAuth('login')}>Sign In</button></li>
+                <li><button onClick={() => handleOpenAuth('register')}>Create Free Account</button></li>
                 <li><button onClick={() => scrollToSection('faq')}>Help & FAQ</button></li>
               </ul>
             </div>

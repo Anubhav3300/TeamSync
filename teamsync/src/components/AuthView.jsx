@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { authenticateUser, registerUser, DEFAULT_USERS } from '../data/authService';
 import {
   Check,
@@ -22,7 +24,12 @@ import {
 } from 'lucide-react';
 
 function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
-  const [mode, setMode] = useState(initialMode);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login } = useAuth();
+
+  const queryMode = searchParams.get('mode');
+  const [mode, setMode] = useState(queryMode || initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,10 +40,31 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
   const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
-    setMode(initialMode);
+    if (queryMode) {
+      setMode(queryMode);
+    } else {
+      setMode(initialMode);
+    }
     setErrorMsg('');
     setSuccessMsg('');
-  }, [initialMode]);
+  }, [initialMode, queryMode]);
+
+  const handleSuccessfulAuth = (user) => {
+    if (onLogin) {
+      onLogin(user, rememberMe);
+    } else {
+      login(user, rememberMe);
+      navigate('/dashboard');
+    }
+  };
+
+  const handleReturnHome = () => {
+    if (onBackToLanding) {
+      onBackToLanding();
+    } else {
+      navigate('/');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,7 +80,7 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
 
       setSuccessMsg('Account created successfully! Launching workspace...');
       setTimeout(() => {
-        onLogin(result.user, rememberMe);
+        handleSuccessfulAuth(result.user);
       }, 500);
     } else {
       const result = authenticateUser(email, password);
@@ -63,7 +91,7 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
 
       setSuccessMsg('Signed in successfully! Loading workspace...');
       setTimeout(() => {
-        onLogin(result.user, rememberMe);
+        handleSuccessfulAuth(result.user);
       }, 400);
     }
   };
@@ -77,7 +105,7 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
     } else if (userKey === 'elena') {
       demoUser = DEFAULT_USERS[2];
     }
-    onLogin(demoUser, rememberMe);
+    handleSuccessfulAuth(demoUser);
   };
 
   const handleFillDemoCredentials = (demoUser) => {
@@ -93,7 +121,7 @@ function AuthView({ onLogin, initialMode = 'login', onBackToLanding }) {
       <div className="auth-banner-col">
         <div>
           <button
-            onClick={onBackToLanding}
+            onClick={handleReturnHome}
             className="auth-brand-header"
             style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
           >

@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import { addTask } from '../store/tasksSlice';
 import { Search, Plus, RotateCcw, CheckSquare, User, Calendar, Folder, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -22,6 +24,7 @@ function KanbanView({
   searchQuery = '',
   onSwitchToTableView
 }) {
+  const dispatch = useDispatch();
   const [localSearch, setLocalSearch] = useState('');
   const [selectedProject, setSelectedProject] = useState('ALL');
   const [selectedPriority, setSelectedPriority] = useState('ALL');
@@ -30,6 +33,31 @@ function KanbanView({
 
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [dragOverColId, setDragOverColId] = useState(null);
+  const [addingTaskColId, setAddingTaskColId] = useState(null);
+  const [quickTaskTitle, setQuickTaskTitle] = useState('');
+
+  const handleQuickCreateTask = (colId) => {
+    if (!quickTaskTitle.trim()) return;
+    const targetProject = projects.find((p) => p.id === selectedProject) || projects[0];
+    const newTask = {
+      id: 'tsk-' + Date.now(),
+      title: quickTaskTitle.trim(),
+      description: 'Quickly added from Kanban board.',
+      projectId: targetProject?.id || 'proj-1',
+      projectName: targetProject?.name || 'Workspace Initiative',
+      status: colId,
+      priority: 'MEDIUM',
+      assigneeName: currentUser?.name || 'Rohan Verma',
+      assigneeId: currentUser?.id || 'usr-1',
+      dueDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+      progress: colId === 'DONE' ? 100 : 0,
+      subtasks: [],
+      comments: []
+    };
+    dispatch(addTask(newTask));
+    setAddingTaskColId(null);
+    setQuickTaskTitle('');
+  };
 
   const query = (searchQuery || localSearch).toLowerCase().trim();
 
@@ -131,7 +159,7 @@ function KanbanView({
             spread: 60,
             origin: { y: 0.7 }
           });
-        } catch (err) {}
+        } catch (err) { }
       }
     }
   };
@@ -147,7 +175,7 @@ function KanbanView({
           spread: 55,
           origin: { y: 0.7 }
         });
-      } catch (err) {}
+      } catch (err) { }
     }
   };
 
@@ -380,7 +408,14 @@ function KanbanView({
                 <button
                   type="button"
                   className="kanban-col-add-btn"
-                  onClick={() => onOpenCreateTask && onOpenCreateTask(col.id)}
+                  onClick={() => {
+                    if (addingTaskColId === col.id) {
+                      setAddingTaskColId(null);
+                    } else {
+                      setAddingTaskColId(col.id);
+                      setQuickTaskTitle('');
+                    }
+                  }}
                   title={`Add new task to ${col.title}`}
                   aria-label={`Add task to ${col.title}`}
                 >
@@ -391,13 +426,13 @@ function KanbanView({
               <div className="kanban-col-subtitle">{col.subtitle}</div>
 
               <div className="kanban-cards-list">
-                {colTasks.length === 0 ? (
+                {colTasks.length === 0 && addingTaskColId !== col.id && (
                   <div className="kanban-col-empty">
                     <div className="kanban-empty-dash" />
                     <span>Drop tasks here</span>
                   </div>
-                ) : (
-                  colTasks.map((task) => {
+                )}
+                {colTasks.map((task) => {
                     const isDone = task.status === 'DONE';
                     const isBeingDragged = draggedTaskId === task.id;
                     const totalSubtasks = task.subtasks?.length || 0;
@@ -409,9 +444,8 @@ function KanbanView({
                         draggable
                         onDragStart={(e) => handleDragStart(e, task.id)}
                         onDragEnd={handleDragEnd}
-                        className={`kanban-task-card ${
-                          isBeingDragged ? 'is-dragging' : ''
-                        } ${isDone ? 'is-done' : ''}`}
+                        className={`kanban-task-card ${isBeingDragged ? 'is-dragging' : ''
+                          } ${isDone ? 'is-done' : ''}`}
                         onClick={() => onTaskClick && onTaskClick(task)}
                       >
                         <div className="kanban-card-top">
@@ -431,9 +465,8 @@ function KanbanView({
                         </div>
 
                         <h4
-                          className={`kanban-card-title ${
-                            isDone ? 'strikethrough' : ''
-                          }`}
+                          className={`kanban-card-title ${isDone ? 'strikethrough' : ''
+                            }`}
                         >
                           {task.title}
                         </h4>
@@ -519,7 +552,59 @@ function KanbanView({
                         </div>
                       </div>
                     );
-                  })
+                  })}
+
+                {addingTaskColId === col.id ? (
+                  <div className="kanban-inline-add-card">
+                    <input
+                      type="text"
+                      className="kanban-inline-input"
+                      placeholder="What needs to be done? Press Enter..."
+                      value={quickTaskTitle}
+                      onChange={(e) => setQuickTaskTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleQuickCreateTask(col.id);
+                        } else if (e.key === 'Escape') {
+                          setAddingTaskColId(null);
+                          setQuickTaskTitle('');
+                        }
+                      }}
+                      autoFocus
+                    />
+                    <div className="kanban-inline-actions">
+                      <button
+                        type="button"
+                        className="btn-primary btn-sm"
+                        onClick={() => handleQuickCreateTask(col.id)}
+                      >
+                        Add Task
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm"
+                        onClick={() => {
+                          setAddingTaskColId(null);
+                          setQuickTaskTitle('');
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="kanban-add-card-btn"
+                    onClick={() => {
+                      setAddingTaskColId(col.id);
+                      setQuickTaskTitle('');
+                    }}
+                  >
+                    <Plus size={14} />
+                    <span>Add task</span>
+                  </button>
                 )}
               </div>
             </div>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
 import DashboardView from './components/DashboardView';
@@ -14,125 +16,72 @@ import CreateProjectModal from './components/modals/CreateProjectModal';
 import CreateTaskModal from './components/modals/CreateTaskModal';
 import TaskDetailsModal from './components/modals/TaskDetailsModal';
 
+import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
+
+// Redux Selectors & Actions
 import {
-  initialProjects,
-  initialTasks,
-  initialTeamMembers,
-  initialNotifications
-} from './data/mockData';
+  selectAllTasks,
+  addTask,
+  updateTask,
+  updateTaskStatus,
+  toggleTaskComplete,
+  deleteTask,
+  deleteTasksByProject,
+  addSubtask,
+  toggleSubtask,
+  addComment,
+  resetTasks,
+  clearTasks
+} from './store/tasksSlice';
 
-function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setTheme }) {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  
-  const userStoragePrefix = `teamsync_${currentUser?.id || 'default'}`;
+import {
+  selectAllProjects,
+  addProject,
+  deleteProject,
+  resetProjects,
+  clearProjects
+} from './store/projectsSlice';
 
-  const [projects, setProjects] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`${userStoragePrefix}_projects`);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return [];
-  });
+import {
+  selectAllTeamMembers,
+  addTeamMember,
+  deleteTeamMember,
+  setTeamMembers,
+  resetTeam
+} from './store/teamSlice';
 
-  const [tasks, setTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`${userStoragePrefix}_tasks`);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return [];
-  });
+import {
+  selectAllNotifications,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+  clearAllNotifications,
+  resetNotifications
+} from './store/notificationsSlice';
 
-  React.useEffect(() => {
-    try {
-      localStorage.setItem(`${userStoragePrefix}_projects`, JSON.stringify(projects));
-    } catch (e) {}
-  }, [projects, userStoragePrefix]);
+function DashboardLayout() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  React.useEffect(() => {
-    try {
-      localStorage.setItem(`${userStoragePrefix}_tasks`, JSON.stringify(tasks));
-    } catch (e) {}
-  }, [tasks, userStoragePrefix]);
+  const { currentUser, updateUser, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
 
-  const [teamMembers, setTeamMembers] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`${userStoragePrefix}_team`);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
+  // Redux state
+  const tasks = useSelector(selectAllTasks);
+  const projects = useSelector(selectAllProjects);
+  const teamMembers = useSelector(selectAllTeamMembers);
+  const notifications = useSelector(selectAllNotifications);
 
-    if (currentUser) {
-      return [
-        {
-          id: currentUser.id || 'usr-me',
-          name: currentUser.name || 'Admin',
-          email: currentUser.email || 'admin@teamsync.io',
-          role: currentUser.role || 'Project Manager',
-          avatar: currentUser.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUser.name || 'Admin')}`,
-          initials: currentUser.initials || (currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : 'ME'),
-          department: currentUser.department || 'Product',
-          activeTasks: 0,
-          maxCapacity: 15,
-          status: 'online'
-        }
-      ];
-    }
-    return [];
-  });
-
-  React.useEffect(() => {
-    try {
-      localStorage.setItem(`${userStoragePrefix}_team`, JSON.stringify(teamMembers));
-    } catch (e) {}
-  }, [teamMembers, userStoragePrefix]);
-
-  const [notifications, setNotifications] = useState(initialNotifications);
-
-  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
-
-  const handleMarkNotificationAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: !n.read } : n))
-    );
-  };
-
-  const handleMarkAllNotificationsAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const handleDeleteNotification = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
-  const handleClearAllNotifications = () => {
-    setNotifications([]);
-  };
-
-  const handleResetNotifications = () => {
-    setNotifications(initialNotifications);
-  };
-
-  const handleNotificationClick = (notif) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
-    );
-    if (notif.type === 'assignment') {
-      setActiveTab('tasks');
-    } else if (notif.type === 'calendar') {
-      setActiveTab('dashboard');
-    } else if (notif.type === 'milestone') {
-      setActiveTab('projects');
-    }
-  };
-
-  const [selectedProject, setSelectedProject] = useState(null);
+  // Search & Modal UI states
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [selectedProject, setSelectedProject] = useState(null);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [createTaskDefaultStatus, setCreateTaskDefaultStatus] = useState('TO DO');
   const [createTaskDefaultDueDate, setCreateTaskDefaultDueDate] = useState('');
   const [selectedTaskDetails, setSelectedTaskDetails] = useState(null);
-
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg) => {
@@ -146,21 +95,23 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     setIsCreateTaskOpen(true);
   };
 
+  // Sample data reset via Redux
   const handleLoadSampleData = () => {
-    setProjects(initialProjects);
-    setTasks(initialTasks);
-    setTeamMembers(initialTeamMembers);
-    setNotifications(initialNotifications);
+    dispatch(resetProjects());
+    dispatch(resetTasks());
+    dispatch(resetTeam());
+    dispatch(resetNotifications());
     if (currentUser?.isNewAccount) {
-      setCurrentUser({ ...currentUser, isNewAccount: false });
+      updateUser({ isNewAccount: false });
     }
-    showToast('✨ Demo sample data and team loaded successfully!');
+    showToast('✨ Demo sample data and team loaded successfully via Redux Toolkit!');
   };
 
+  // Clear workspace via Redux
   const handleClearAllProjects = () => {
-    setProjects([]);
-    setTasks([]);
-    setNotifications([]);
+    dispatch(clearProjects());
+    dispatch(clearTasks());
+    dispatch(clearAllNotifications());
     setSelectedProject(null);
     setSelectedTaskDetails(null);
 
@@ -179,51 +130,44 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
       }
     ] : [];
 
-    setTeamMembers(soloTeam);
-
-    try {
-      localStorage.setItem(`${userStoragePrefix}_projects`, JSON.stringify([]));
-      localStorage.setItem(`${userStoragePrefix}_tasks`, JSON.stringify([]));
-      localStorage.setItem(`${userStoragePrefix}_team`, JSON.stringify(soloTeam));
-    } catch (e) {}
-
-    showToast('🧹 Workspace & Team cleared. You now have a 100% clean slate!');
+    dispatch(setTeamMembers(soloTeam));
+    showToast('🧹 Workspace & Team cleared. You now have a clean slate!');
   };
 
-  const handleAddProject = (newProject) => {
-    setProjects([newProject, ...projects]);
+  // Project handlers
+  const handleAddProject = (newProj) => {
+    dispatch(addProject(newProj));
 
-    const projectMemberNames = Array.isArray(newProject.members) ? [...newProject.members] : [];
-    if (newProject.manager && !projectMemberNames.includes(newProject.manager)) {
-      projectMemberNames.push(newProject.manager);
+    const projectMemberNames = Array.isArray(newProj.members) ? [...newProj.members] : [];
+    if (newProj.manager && !projectMemberNames.includes(newProj.manager)) {
+      projectMemberNames.push(newProj.manager);
     }
 
     const membersToAdd = [];
-
     projectMemberNames.forEach((rawName) => {
       if (!rawName || typeof rawName !== 'string') return;
       const cleanName = rawName.trim();
       if (!cleanName) return;
 
       const alreadyExists = teamMembers.some(
-        tm => tm.id === cleanName || tm.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
+        (tm) => tm.id === cleanName || tm.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
       );
 
       if (!alreadyExists) {
         const alreadyStaged = membersToAdd.some(
-          st => st.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
+          (st) => st.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
         );
 
         if (!alreadyStaged) {
           const nameParts = cleanName.split(' ');
-          const initials = nameParts.map(p => p[0]).slice(0, 2).join('').toUpperCase() || 'TM';
+          const initials = nameParts.map((p) => p[0]).slice(0, 2).join('').toUpperCase() || 'TM';
           const emailPrefix = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '.').replace(/\.+/g, '.');
-          const isManager = cleanName.toLowerCase() === (newProject.manager || '').toLowerCase();
+          const isManager = cleanName.toLowerCase() === (newProj.manager || '').toLowerCase();
 
           let dept = 'Engineering';
-          if (newProject.category?.toLowerCase().includes('design')) dept = 'Design';
-          else if (newProject.category?.toLowerCase().includes('marketing') || newProject.category?.toLowerCase().includes('growth')) dept = 'Marketing';
-          else if (newProject.category?.toLowerCase().includes('data') || newProject.category?.toLowerCase().includes('ai')) dept = 'Data & AI';
+          if (newProj.category?.toLowerCase().includes('design')) dept = 'Design';
+          else if (newProj.category?.toLowerCase().includes('marketing') || newProj.category?.toLowerCase().includes('growth')) dept = 'Marketing';
+          else if (newProj.category?.toLowerCase().includes('data') || newProj.category?.toLowerCase().includes('ai')) dept = 'Data & AI';
           else if (isManager) dept = 'Product';
 
           membersToAdd.push({
@@ -243,133 +187,111 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
     });
 
     if (membersToAdd.length > 0) {
-      setTeamMembers(prev => [...prev, ...membersToAdd]);
+      membersToAdd.forEach((m) => dispatch(addTeamMember(m)));
       showToast(`Project created & ${membersToAdd.length} member(s) added to Team Directory!`);
     } else {
-      showToast(`Project "${newProject.name}" created!`);
+      showToast(`Project "${newProj.name}" created!`);
     }
   };
 
   const handleDeleteProject = (projectId) => {
-    setProjects(projects.filter(p => p.id !== projectId));
-    setTasks(tasks.filter(t => t.projectId !== projectId));
+    dispatch(deleteProject(projectId));
+    dispatch(deleteTasksByProject(projectId));
     if (selectedProject?.id === projectId) setSelectedProject(null);
-    showToast('Project deleted.');
+    showToast('Project and linked tasks deleted.');
   };
 
+  // Task handlers
   const handleAddTask = (newTask) => {
-    setTasks([newTask, ...tasks]);
-    setProjects(projects.map(p => {
-      if (p.id === newTask.projectId) {
-        return { ...p, totalTasks: (p.totalTasks || 0) + 1 };
-      }
-      return p;
-    }));
-    showToast(`Task "${newTask.title}" added.`);
-  };
-
-  const handleUpdateTask = (updatedTask) => {
-    setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
-    if (selectedTaskDetails?.id === updatedTask.id) {
-      setSelectedTaskDetails(updatedTask);
-    }
-    showToast(`Task "${updatedTask.title}" saved successfully!`);
+    dispatch(addTask(newTask));
+    showToast(`Task "${newTask.title}" created successfully!`);
   };
 
   const handleUpdateTaskStatus = (taskId, newStatus) => {
-    setTasks(tasks.map(t => {
-      if (t.id === taskId) {
-        return { ...t, status: newStatus };
-      }
-      return t;
-    }));
-
+    dispatch(updateTaskStatus({ id: taskId, status: newStatus }));
     if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
-      setSelectedTaskDetails(prev => ({ ...prev, status: newStatus }));
+      setSelectedTaskDetails((prev) => ({ ...prev, status: newStatus }));
     }
-
-    showToast(`Task moved to ${newStatus}`);
   };
 
   const handleToggleTaskComplete = (taskId) => {
-    setTasks(tasks.map(t => {
-      if (t.id === taskId) {
-        const nextStatus = t.status === 'DONE' ? 'TO DO' : 'DONE';
-        return { ...t, status: nextStatus };
-      }
-      return t;
-    }));
+    dispatch(toggleTaskComplete(taskId));
+    if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
+      setSelectedTaskDetails((prev) => {
+        const nextDone = prev.status !== 'DONE';
+        return {
+          ...prev,
+          status: nextDone ? 'DONE' : 'IN PROGRESS',
+          completed: nextDone,
+          progress: nextDone ? 100 : Math.min(prev.progress || 50, 75)
+        };
+      });
+    }
   };
 
   const handleDeleteTask = (taskId) => {
-    setTasks(tasks.filter(t => t.id !== taskId));
-    if (selectedTaskDetails?.id === taskId) {
+    dispatch(deleteTask(taskId));
+    if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
       setSelectedTaskDetails(null);
     }
     showToast('Task removed.');
   };
 
-  const handleAddComment = (taskId, newComment) => {
-    setTasks(tasks.map(t => {
-      if (t.id === taskId) {
-        const updated = [...(t.comments || []), newComment];
-        return { ...t, comments: updated, commentsCount: updated.length };
-      }
-      return t;
-    }));
-
-    if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
-      setSelectedTaskDetails(prev => {
-        const updated = [...(prev.comments || []), newComment];
-        return { ...prev, comments: updated, commentsCount: updated.length };
-      });
+  const handleUpdateTask = (updatedTask) => {
+    dispatch(updateTask(updatedTask));
+    if (selectedTaskDetails && selectedTaskDetails.id === updatedTask.id) {
+      setSelectedTaskDetails(updatedTask);
     }
-    showToast('Comment posted!');
+    showToast('Task updated.');
+  };
+
+  const handleAddComment = (taskId, comment) => {
+    dispatch(addComment({ taskId, comment }));
+    if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
+      setSelectedTaskDetails((prev) => ({
+        ...prev,
+        comments: [...(prev.comments || []), comment]
+      }));
+    }
   };
 
   const handleToggleSubtask = (taskId, subtaskId) => {
-    setTasks(tasks.map(t => {
-      if (t.id === taskId) {
-        const updated = t.subtasks?.map(st => {
-          if (st.id === subtaskId) return { ...st, done: !st.done };
-          return st;
-        });
-        return { ...t, subtasks: updated };
-      }
-      return t;
-    }));
-
+    dispatch(toggleSubtask({ taskId, subtaskId }));
     if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
-      setSelectedTaskDetails(prev => {
-        const updated = prev.subtasks?.map(st => {
-          if (st.id === subtaskId) return { ...st, done: !st.done };
-          return st;
-        });
-        return { ...prev, subtasks: updated };
+      setSelectedTaskDetails((prev) => {
+        const updated = (prev.subtasks || []).map((st) =>
+          st.id === subtaskId ? { ...st, completed: !st.completed } : st
+        );
+        const doneCount = updated.filter((s) => s.completed).length;
+        const progress = Math.round((doneCount / updated.length) * 100);
+        return {
+          ...prev,
+          subtasks: updated,
+          progress,
+          status: progress === 100 ? 'DONE' : prev.status
+        };
       });
     }
   };
 
-  const handleAddSubtask = (taskId, text) => {
-    const newSt = { id: 'st-' + Date.now(), text, done: false };
-    setTasks(tasks.map(t => {
-      if (t.id === taskId) {
-        const updated = [...(t.subtasks || []), newSt];
-        return { ...t, subtasks: updated };
-      }
-      return t;
-    }));
-
+  const handleAddSubtask = (taskId, title) => {
+    const newSt = {
+      id: 'st-' + Date.now(),
+      title,
+      completed: false
+    };
+    dispatch(addSubtask({ taskId, subtask: newSt }));
     if (selectedTaskDetails && selectedTaskDetails.id === taskId) {
-      setSelectedTaskDetails(prev => ({
+      setSelectedTaskDetails((prev) => ({
         ...prev,
         subtasks: [...(prev.subtasks || []), newSt]
       }));
     }
   };
 
+  // Team member handlers
   const handleAddTeamMember = (newMember) => {
-    setTeamMembers([...teamMembers, newMember]);
+    dispatch(addTeamMember(newMember));
     showToast(`Invited ${newMember.name} to workspace!`);
   };
 
@@ -378,15 +300,24 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
       showToast('Cannot remove workspace owner.');
       return;
     }
-    setTeamMembers(teamMembers.filter(m => m.id !== memberId));
+    dispatch(deleteTeamMember(memberId));
     showToast('Team member removed.');
   };
 
-  const handleExportReport = () => {
-    setActiveTab('reports');
+  // Notification handlers
+  const handleNotificationClick = (notif) => {
+    dispatch(markAsRead(notif.id));
+    if (notif.type === 'assignment') {
+      navigate('/tasks');
+    } else if (notif.type === 'calendar') {
+      navigate('/dashboard');
+    } else if (notif.type === 'milestone') {
+      navigate('/projects');
+    }
   };
 
-  const pendingTasksCount = tasks.filter(t => t.status !== 'DONE').length;
+  // Determine current active view based on React Router location pathname
+  const currentPath = location.pathname.replace(/^\//, '') || 'dashboard';
 
   return (
     <div className="app-container">
@@ -415,42 +346,33 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
         </div>
       )}
 
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        theme={theme}
-        setTheme={setTheme}
-        onLogout={onLogout}
-        pendingTasksCount={pendingTasksCount}
-        unreadNotificationsCount={unreadNotificationsCount}
-        showToast={showToast}
-      />
+      {/* Modern Sidebar with React Router NavLinks */}
+      <Sidebar />
 
       <div className="main-wrapper">
+        {/* TopNav connected to AuthContext & ThemeContext */}
         <TopNav
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          currentUser={currentUser}
-          setCurrentUser={setCurrentUser}
-          onLogout={onLogout}
         />
 
-        {activeTab === 'dashboard' && (
+        {/* View rendering based on URL route */}
+        {currentPath === 'dashboard' && (
           <DashboardView
             currentUser={currentUser}
             projects={projects}
             tasks={tasks}
             teamMembers={teamMembers}
-            onNavigateToProjects={() => setActiveTab('projects')}
-            onNavigateToTasks={(projectId) => {
-              if (projectId) {
-                const p = projects.find(proj => proj.id === projectId);
+            onNavigateToProjects={() => navigate('/projects')}
+            onNavigateToTasks={(projId) => {
+              if (projId) {
+                const p = projects.find((proj) => proj.id === projId);
                 if (p) setSelectedProject(p);
               }
-              setActiveTab('tasks');
+              navigate('/tasks');
             }}
-            onNavigateToKanban={() => setActiveTab('kanban')}
-            onNavigateToTeam={() => setActiveTab('team')}
+            onNavigateToKanban={() => navigate('/kanban')}
+            onNavigateToTeam={() => navigate('/team')}
             onTaskClick={(task) => setSelectedTaskDetails(task)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onUpdateTaskStatus={handleUpdateTaskStatus}
@@ -458,17 +380,17 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             onOpenCreateTask={handleOpenCreateTask}
             onClearAllProjects={handleClearAllProjects}
             onLoadSampleData={handleLoadSampleData}
-            onExportReport={handleExportReport}
+            onExportReport={() => navigate('/reports')}
           />
         )}
 
-        {activeTab === 'projects' && (
+        {currentPath === 'projects' && (
           <ProjectsView
             projects={projects}
             onOpenCreateProject={() => setIsCreateProjectOpen(true)}
             onSelectProject={(project) => {
               setSelectedProject(project);
-              setActiveTab('tasks');
+              navigate('/tasks');
             }}
             onDeleteProject={handleDeleteProject}
             onClearAllProjects={handleClearAllProjects}
@@ -478,7 +400,7 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           />
         )}
 
-        {activeTab === 'kanban' && (
+        {currentPath === 'kanban' && (
           <KanbanView
             tasks={tasks}
             projects={projects}
@@ -490,11 +412,11 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             onUpdateTaskStatus={handleUpdateTaskStatus}
             onDeleteTask={handleDeleteTask}
             searchQuery={searchQuery}
-            onSwitchToTableView={() => setActiveTab('tasks')}
+            onSwitchToTableView={() => navigate('/tasks')}
           />
         )}
 
-        {activeTab === 'tasks' && (
+        {currentPath === 'tasks' && (
           <TasksView
             tasks={tasks}
             projects={projects}
@@ -506,11 +428,11 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
             onUpdateTaskStatus={handleUpdateTaskStatus}
             onDeleteTask={handleDeleteTask}
             searchQuery={searchQuery}
-            onSwitchToKanbanView={() => setActiveTab('kanban')}
+            onSwitchToKanbanView={() => navigate('/kanban')}
           />
         )}
 
-        {activeTab === 'team' && (
+        {currentPath === 'team' && (
           <TeamView
             teamMembers={teamMembers}
             currentUser={currentUser}
@@ -526,41 +448,45 @@ function DashboardLayout({ currentUser, setCurrentUser, onLogout, theme, setThem
           />
         )}
 
-        {activeTab === 'notifications' && (
+        {currentPath === 'notifications' && (
           <NotificationsView
             notifications={notifications}
-            onMarkAsRead={handleMarkNotificationAsRead}
-            onMarkAllAsRead={handleMarkAllNotificationsAsRead}
-            onDeleteNotification={handleDeleteNotification}
-            onClearAllNotifications={handleClearAllNotifications}
-            onResetNotifications={handleResetNotifications}
+            onMarkAsRead={(id) => dispatch(markAsRead(id))}
+            onMarkAllAsRead={() => dispatch(markAllAsRead())}
+            onDeleteNotification={(id) => dispatch(deleteNotification(id))}
+            onClearAllNotifications={() => dispatch(clearAllNotifications())}
+            onResetNotifications={() => dispatch(resetNotifications())}
             onNotificationClick={handleNotificationClick}
             showToast={showToast}
           />
         )}
 
-        {activeTab === 'reports' && (
+        {currentPath === 'reports' && (
           <ReportsView
             projects={projects}
             tasks={tasks}
             teamMembers={teamMembers}
-            onExportReport={handleExportReport}
+            onExportReport={() => showToast('Report exported successfully!')}
           />
         )}
 
-        {activeTab === 'settings' && (
+        {currentPath === 'settings' && (
           <SettingsView
             currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
+            setCurrentUser={updateUser}
             theme={theme}
             setTheme={setTheme}
-            onLogout={onLogout}
+            onLogout={logout}
             onClearAllProjects={handleClearAllProjects}
             onLoadSampleData={handleLoadSampleData}
           />
         )}
+
+        {/* Supports standard React Router Outlet for any sub-routes */}
+        <Outlet />
       </div>
 
+      {/* Global Modals for Form Handling */}
       <CreateProjectModal
         isOpen={isCreateProjectOpen}
         onClose={() => setIsCreateProjectOpen(false)}

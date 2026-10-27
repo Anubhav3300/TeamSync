@@ -1,14 +1,31 @@
 import React, { useState } from 'react';
-import { Search, X, ChevronDown, LogOut, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, X, ChevronDown, LogOut, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 function TopNav({
   searchQuery,
   setSearchQuery,
-  currentUser,
-  setCurrentUser,
-  onLogout
+  currentUser: propUser,
+  onLogout: propLogout
 }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { currentUser: authUser, logout: authLogout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const user = propUser || authUser;
+
+  const handleSignOut = () => {
+    setShowProfileMenu(false);
+    if (propLogout) {
+      propLogout();
+    } else {
+      authLogout();
+      navigate('/');
+    }
+  };
 
   return (
     <header className="top-nav">
@@ -18,8 +35,8 @@ function TopNav({
           type="text"
           className="nav-search-input"
           placeholder="Search tasks, projects, or people..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery || ''}
+          onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
         />
         {searchQuery && (
           <button
@@ -32,7 +49,7 @@ function TopNav({
               alignItems: 'center',
               padding: '2px'
             }}
-            onClick={() => setSearchQuery('')}
+            onClick={() => setSearchQuery && setSearchQuery('')}
             title="Clear search"
           >
             <X size={14} />
@@ -41,6 +58,26 @@ function TopNav({
       </div>
 
       <div className="top-nav-right">
+        {/* Quick Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="btn-secondary btn-icon"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+          style={{
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border)',
+            cursor: 'pointer',
+            padding: '8px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-main)'
+          }}
+        >
+          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+        </button>
+
         <div style={{ position: 'relative' }}>
           <button
             className="user-profile-btn"
@@ -49,13 +86,13 @@ function TopNav({
             }}
           >
             <img
-              src={currentUser?.avatar}
-              alt={currentUser?.name}
+              src={user?.avatar}
+              alt={user?.name}
               className="user-avatar-img"
             />
             <div className="user-info-text">
-              <span className="user-info-name">{currentUser?.name || 'Workspace User'}</span>
-              <span className="user-info-role">{currentUser?.role || 'Member'}</span>
+              <span className="user-info-name">{user?.name || 'Workspace User'}</span>
+              <span className="user-info-role">{user?.role || 'Member'}</span>
             </div>
             <ChevronDown size={14} style={{ color: 'var(--text-muted)' }} />
           </button>
@@ -76,45 +113,40 @@ function TopNav({
               }}
             >
               <div style={{ marginBottom: '12px' }}>
-                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{currentUser?.name}</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{currentUser?.email}</div>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{user?.name}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{user?.email}</div>
                 <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <ShieldCheck size={14} style={{ color: 'var(--primary)' }} />
                   <span className="priority-tag priority-high" style={{ fontSize: '0.7rem' }}>
-                    Role: {currentUser?.role || currentUser?.systemRole || 'Member'}
+                    Role: {user?.role || user?.systemRole || 'Member'}
                   </span>
                 </div>
               </div>
 
-              {onLogout && (
-                <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border)' }}>
-                  <button
-                    onClick={() => {
-                      setShowProfileMenu(false);
-                      onLogout();
-                    }}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '8px 12px',
-                      borderRadius: '6px',
-                      color: '#EF4444',
-                      fontWeight: 600,
-                      fontSize: '0.85rem',
-                      background: 'rgba(239, 68, 68, 0.08)',
-                      border: '1px solid rgba(239, 68, 68, 0.2)',
-                      cursor: 'pointer',
-                      textAlign: 'center'
-                    }}
-                  >
-                    <LogOut size={14} />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
-              )}
+              <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border)' }}>
+                <button
+                  onClick={handleSignOut}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    color: '#EF4444',
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    background: 'rgba(239, 68, 68, 0.08)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    cursor: 'pointer',
+                    textAlign: 'center'
+                  }}
+                >
+                  <LogOut size={14} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -1,4 +1,9 @@
 import React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectPendingTasksCount } from '../store/tasksSlice';
+import { selectUnreadNotificationsCount } from '../store/notificationsSlice';
+import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -12,72 +17,86 @@ import {
   Bell
 } from 'lucide-react';
 
-function Sidebar({
-  activeTab,
-  setActiveTab,
-  theme,
-  setTheme,
-  onLogout,
-  pendingTasksCount,
-  unreadNotificationsCount
-}) {
+function Sidebar({ onLogout: customLogout }) {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  
+  const pendingTasksCount = useSelector(selectPendingTasksCount);
+  const unreadNotificationsCount = useSelector(selectUnreadNotificationsCount);
+
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'projects', label: 'My Projects', icon: FolderKanban },
-    { id: 'kanban', label: 'Kanban Board', icon: Kanban },
-    { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: pendingTasksCount },
+    { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'projects', path: '/projects', label: 'My Projects', icon: FolderKanban },
+    { id: 'kanban', path: '/kanban', label: 'Kanban Board', icon: Kanban },
+    { id: 'tasks', path: '/tasks', label: 'Tasks', icon: CheckSquare, badge: pendingTasksCount },
     {
       id: 'notifications',
+      path: '/notifications',
       label: 'Notifications',
       icon: Bell,
       badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : null
     },
-    { id: 'team', label: 'Team', icon: Users },
-    { id: 'reports', label: 'Reports', icon: BarChart3 }
+    { id: 'team', path: '/team', label: 'Team', icon: Users },
+    { id: 'reports', path: '/reports', label: 'Reports', icon: BarChart3 }
   ];
 
   const bottomItems = [
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'settings', path: '/settings', label: 'Settings', icon: Settings }
   ];
 
-  const renderNavItem = (item) => {
+  const handleSignOut = () => {
+    if (customLogout) {
+      customLogout();
+    } else {
+      logout();
+      navigate('/');
+    }
+  };
+
+  const renderNavLink = (item) => {
     const Icon = item.icon;
-    const isActive = activeTab === item.id;
     return (
-      <button
+      <NavLink
         key={item.id}
-        className={`nav-item ${isActive ? 'active' : ''}`}
-        onClick={() => setActiveTab(item.id)}
+        to={item.path}
+        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        style={{ textDecoration: 'none' }}
       >
-        <Icon size={18} className="nav-icon" strokeWidth={isActive ? 2.3 : 1.8} />
-        <span>{item.label}</span>
-        {item.badge ? (
-          <span className={`nav-badge ${item.id === 'notifications' ? 'urgent' : ''}`}>
-            {item.badge}
-          </span>
-        ) : null}
-      </button>
+        {({ isActive }) => (
+          <>
+            <Icon size={18} className="nav-icon" strokeWidth={isActive ? 2.3 : 1.8} />
+            <span>{item.label}</span>
+            {item.badge ? (
+              <span className={`nav-badge ${item.id === 'notifications' ? 'urgent' : ''}`}>
+                {item.badge}
+              </span>
+            ) : null}
+          </>
+        )}
+      </NavLink>
     );
   };
 
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <div className="brand-icon-box">
-          <Check size={18} strokeWidth={3} />
-        </div>
-        <div className="brand-info">
-          <div className="brand-title">TeamSync</div>
-          <span className="brand-version">Enterprise OS</span>
-        </div>
+        <NavLink to="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="brand-icon-box">
+            <Check size={18} strokeWidth={3} />
+          </div>
+          <div className="brand-info">
+            <div className="brand-title">TeamSync</div>
+            <span className="brand-version">Enterprise OS</span>
+          </div>
+        </NavLink>
       </div>
 
       <nav className="sidebar-nav">
-        {navItems.map(renderNavItem)}
+        {navItems.map(renderNavLink)}
       </nav>
 
       <div className="sidebar-footer">
-        {bottomItems.map(renderNavItem)}
+        {bottomItems.map(renderNavLink)}
 
         <div className="sidebar-divider" />
 
@@ -89,9 +108,10 @@ function Sidebar({
               justifyContent: 'center',
               color: 'var(--danger)',
               borderColor: 'var(--border)',
-              gap: '8px'
+              gap: '8px',
+              cursor: 'pointer'
             }}
-            onClick={onLogout}
+            onClick={handleSignOut}
           >
             <LogOut size={14} />
             <span>Sign Out</span>

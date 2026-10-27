@@ -12,14 +12,26 @@ function TasksView({
   onUpdateTaskStatus,
   onDeleteTask,
   searchQuery,
+  setSearchQuery,
   onSwitchToKanbanView
 }) {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
   const [projectFilter, setProjectFilter] = useState('ALL');
-  const [localSearch, setLocalSearch] = useState('');
+  const [localSearch, setLocalSearch] = useState(searchQuery || '');
 
-  const query = searchQuery || localSearch;
+  React.useEffect(() => {
+    setLocalSearch(searchQuery || '');
+  }, [searchQuery]);
+
+  const handleSearchChange = (val) => {
+    setLocalSearch(val);
+    if (setSearchQuery) {
+      setSearchQuery(val);
+    }
+  };
+
+  const query = (localSearch || searchQuery || '').toLowerCase().trim();
 
   const filteredTasks = tasks.filter((t) => {
     const matchesSearch =
